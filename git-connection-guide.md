@@ -48,3 +48,25 @@ GitHub-Repo mit VS Code verbinden
    ```bash
    git add .
    git commit -m "Mein erster Commit"
+2. **Push zum GitHub-Repo:**
+    ```bash
+    git push
+Bei erstmaligem Push wirst du nach Authentifizierung gefragt.
+
+   ## GitHub-Zugriff autorisieren (Personal Access Token)
+
+GitHub unterstützt keine Passwörter mehr beim Push – stattdessen brauchst du ein Personal Access Token (PAT).
+
+**So bekommst du deinen Token:**
+1. Rufe die Seite \<https://github.com/settings/tokens\> auf.
+2. Wähle `Generate new token` (Classic oder Fine-grained).
+3. Aktiviere mind. die Rechte `repo`.
+4. Setze ein Ablaufdatum.
+5. Kopiere den Token (wird nur einmal angezeigt).
+
+Beim Push in VS Code:
+- Benutzername: dein GitHub-Username
+- Passwort: dein kopierter Token
+
+**Offizielle Anleitung:**  
+\<https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token\>
