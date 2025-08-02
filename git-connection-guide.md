@@ -47,7 +47,7 @@ GitHub-Repo mit VS Code verbinden
 1. **Code committen:**  
    ```bash
    git add .
-   git commit -m "Mein erster Commit"
+   git commit -m "Beispiel-Text (Enthält kurze Beschreibung der Änderung)"
 2. **Push zum GitHub-Repo:**
     ```bash
     git push
