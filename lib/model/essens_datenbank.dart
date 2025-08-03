@@ -17,7 +17,6 @@ class Essensdatenbank {
 
   List<Essen> alleEssen = [
     Essen(name: 'Spaghetti Carbonara', preis: 8.50, art: EssensArt.mitFleisch),
-    // ... (restliche Essen wie gehabt)
     Essen(name: 'Linsen-Curry', preis: 7.20, art: EssensArt.vegan),
     Essen(name: 'Käsespätzle', preis: 7.80, art: EssensArt.vegetarisch),
     Essen(name: 'Hähnchen süß-sauer', preis: 9.20, art: EssensArt.mitFleisch),
@@ -31,13 +30,21 @@ class Essensdatenbank {
 
   late List<Essensplan> wochenplaene;
 
-  // --- NEUE ZENTRALE FUNKTIONEN ---
   void addEssen(Essen neuesEssen) {
     alleEssen.add(neuesEssen);
   }
 
+  // GEÄNDERT: Die deleteEssen-Funktion wurde erweitert.
   void deleteEssen(Essen essen) {
+    // Schritt 1: Aus der Master-Liste entfernen (wie bisher).
     alleEssen.remove(essen);
+
+    // NEU - Schritt 2: Alle Wochenpläne durchgehen und das gelöschte Essen ebenfalls entfernen.
+    for (final plan in wochenplaene) {
+      // "removeWhere" entfernt alle Elemente, die die Bedingung erfüllen.
+      // Wir vergleichen über den Namen, um sicherzugehen.
+      plan.essenProWoche.removeWhere((item) => item.name == essen.name);
+    }
   }
 
   void updateEssen(int index, Essen geaendertesEssen) {
