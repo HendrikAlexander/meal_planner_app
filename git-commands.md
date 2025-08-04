@@ -1,4 +1,4 @@
-# 🧩 Git Command Übersicht fürs Team
+# 🧩 Git Command Übersicht
 
 ## 🔁 Allgemeine Projektpflege
 
@@ -61,3 +61,96 @@
 |-----------------------------|--------------------------------------------------|
 | Push ohne Passwort          | GitHub verlangt einen **Personal Access Token** |
 | Token erzeugen              | [Token erstellen](https://github.com/settings/tokens) |
+
+---   
+
+
+# ✅ Git Feature-Branch mit `main` mergen
+
+Diese Anleitung zeigt dir Schritt für Schritt, wie du deinen Feature-Branch sauber in den `main`-Branch mergen kannst, damit dein Team Zugriff auf deinen erstellten Code hat.
+
+---
+
+#### Beispiel Branch: `login`
+
+---
+
+## 🧭 Schritte (lokal + GitHub)
+
+### 1. 📍 Sicherstellen, dass du im Branch `login` bist:
+
+```bash
+git branch
+# Falls du nicht auf login bist:
+git checkout login
+```
+
+---
+
+### 2. 💾 Änderungen committen:
+
+```bash
+git add .
+git commit -m "Login-Funktion fertig"
+```
+
+---
+
+### 3. 🔄 Den aktuellen `main`-Branch holen:
+
+```bash
+git checkout main
+git pull origin main
+```
+
+---
+
+### 4. 🔀 Zurück zu `login` und `main` hineinmischen:
+
+```bash
+git checkout login
+git merge main
+```
+
+*(Optional: Testen, ob alles läuft)*
+
+---
+
+### 5. 📤 Merge `login` → `main`:
+
+```bash
+git checkout main
+git merge login
+```
+
+**Falls Konflikte auftreten:**
+- Konflikte manuell lösen
+- Danach:
+
+```bash
+git add .
+git commit -m "Konflikte beim Login-Merge gelöst"
+```
+
+---
+
+### 6. 🚀 Änderungen in `main` pushen:
+
+```bash
+git push origin main
+```
+
+---
+
+## 🧹 Optional: Feature-Branch löschen
+
+```bash
+git branch -d login                 # lokal löschen
+git push origin --delete login     # remote löschen (optional)
+```
+
+---
+
+## ✅ Ergebnis:
+- `main` enthält jetzt den Login-Code
+- Dein Team kann ihn mit `git pull` abrufen
