@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../viewmodel/essensbewertung_viewmodel.dart';
@@ -32,7 +33,14 @@ class BewertungenListe extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Kommentar: ${bewertung.essensbewertungstext}'),
-                        // Hier könnte später ein Bild/Foto ergänzt werden
+                        const SizedBox(height: 8),
+                        // 📸 Zeige Bild, falls vorhanden
+                        if (bewertung.essensfoto.isNotEmpty)
+                          Image.file(
+                            File(bewertung.essensfoto),
+                            height: 120,
+                            fit: BoxFit.cover,
+                          ),
                       ],
                     ),
                     // 🖊️ Button zum Bearbeiten

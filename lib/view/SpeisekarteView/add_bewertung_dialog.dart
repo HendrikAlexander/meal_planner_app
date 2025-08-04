@@ -1,4 +1,6 @@
+import 'dart:io'; // Für File
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart'; // Für Kamera
 import 'package:provider/provider.dart';
 import '../../model/essensbewertung.dart';
 import '../../viewmodel/essensbewertung_viewmodel.dart';
@@ -17,6 +19,7 @@ class AddBewertungDialog extends StatefulWidget {
 class _AddBewertungDialogState extends State<AddBewertungDialog> {
   final TextEditingController _textController = TextEditingController();
   int _selectedRating = 3;
+  File? _imageFile; // 📸 Bild-Datei (vom Nutzer aufgenommen)
 
   @override
   void initState() {
@@ -25,6 +28,20 @@ class _AddBewertungDialogState extends State<AddBewertungDialog> {
     if (widget.vorhandeneBewertung != null) {
       _selectedRating = widget.vorhandeneBewertung!.essensbewertung;
       _textController.text = widget.vorhandeneBewertung!.essensbewertungstext;
+      if (widget.vorhandeneBewertung!.essensfoto.isNotEmpty) {
+        _imageFile = File(widget.vorhandeneBewertung!.essensfoto);
+      }
+    }
+  }
+
+  // 📷 Öffnet die Kamera und speichert das aufgenommene Bild
+  Future<void> _bildAufnehmen() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
     }
   }
 
@@ -63,6 +80,18 @@ class _AddBewertungDialogState extends State<AddBewertungDialog> {
               border: OutlineInputBorder(),
             ),
           ),
+          const SizedBox(height: 16),
+          // 📸 Kamera-Button und Bild-Vorschau
+          ElevatedButton.icon(
+            onPressed: _bildAufnehmen,
+            icon: const Icon(Icons.camera_alt),
+            label: const Text("Foto aufnehmen"),
+          ),
+          if (_imageFile != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Image.file(_imageFile!, height: 100),
+            ),
         ],
       ),
       actions: [
@@ -76,7 +105,7 @@ class _AddBewertungDialogState extends State<AddBewertungDialog> {
           onPressed: () {
             // Neue Bewertung erstellen
             final neueBewertung = Essensbewertung(
-              essensfoto: '', // Platzhalter – Foto kommt später
+              essensfoto: _imageFile?.path ?? '', // ✅ Bildpfad speichern
               essensbewertung: _selectedRating,
               essensbewertungstext: _textController.text,
             );
