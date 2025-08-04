@@ -41,7 +41,7 @@ class Startbildschirm extends StatelessWidget {
             title: const Text('Bewertungen'),
             subtitle: const Text('Alle abgegebenen Bewertungen einsehen'),
             onTap: () {
-              // Diese Funktion wird später implementiert
+              Navigator.pushNamed(context, '/bewertungen');
             },
           ),
         ],

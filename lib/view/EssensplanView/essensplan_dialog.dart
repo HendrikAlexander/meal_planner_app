@@ -5,6 +5,8 @@ import '../../model/essens_art.dart';
 import '../../model/essensplan.dart';
 import '../../viewmodel/EssensplanViewModel/essensplan_viewmodel.dart';
 import 'add_essensplan_dialog.dart';
+import '../SpeisekarteView/add_bewertung_dialog.dart';
+
 
 class EssensplanDialog extends StatefulWidget {
   const EssensplanDialog({super.key});
@@ -135,6 +137,17 @@ class _EssensplanDialogState extends State<EssensplanDialog> {
                       title: Text('Woche ${plan.wochennummer}',
                           style: const TextStyle(fontWeight: FontWeight.bold)),
                       subtitle: Text(gerichteText),
+                      trailing: IconButton(
+  icon: const Icon(Icons.rate_review),
+  tooltip: 'Bewertung abgeben',
+  onPressed: () {
+    showDialog(
+      context: context,
+      builder: (context) => const AddBewertungDialog(),
+    );
+  },
+),
+
                       onTap: () {
                         _einenPlanBearbeiten(plan);
                       },
