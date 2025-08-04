@@ -1,28 +1,30 @@
 // lib/main.dart
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+// Bestehende Importe
 import 'view/SpeisekarteView/essen_dialog.dart';
-// GEÄNDERT: Der Import-Pfad zeigt jetzt auf die neue Datei
 import 'view/Startseite/startbildschirm.dart';
 import 'view/EssensplanView/essensplan_dialog.dart';
-import 'viewmodel/essensbewertung_viewmodel.dart';
-import 'package:provider/provider.dart';
 import 'view/SpeisekarteView/bewertungen_liste.dart';
+import 'viewmodel/essensbewertung_viewmodel.dart';
 
-
-
+// NEU: Login-View + ViewModel importieren
+import 'view/LoginView/login_view.dart';
+import 'viewmodel/LoginViewModel/login_viewmodel.dart';
 
 void main() {
   runApp(
     MultiProvider(
       providers: [
-      ChangeNotifierProvider(create: (_) => EssensbewertungViewModel()),
+        ChangeNotifierProvider(create: (_) => EssensbewertungViewModel()),
+        ChangeNotifierProvider(create: (_) => LoginViewModel()), // NEU
       ],
       child: const MyApp(),
     ),
   );
 }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -35,8 +37,9 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
         useMaterial3: true,
       ),
-      initialRoute: '/',
+      initialRoute: '/login', // <-- NEU: Login zuerst anzeigen
       routes: {
+        '/login': (context) => const LoginView(), // NEU
         '/': (context) => const Startbildschirm(),
         '/speisekarte': (context) => const EssenDialog(),
         '/essensplan': (context) => const EssensplanDialog(),
