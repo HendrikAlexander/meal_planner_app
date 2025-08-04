@@ -3,7 +3,7 @@ GitHub-Repo mit VS Code verbinden
 
 **Projektname:** meal_planner_app  
 **GitHub-URL:**  
-\<https://github.com/HendrikAlexander/meal_planner_app\>
+https://github.com/HendrikAlexander/meal_planner_app
 
 ## Voraussetzungen (einmalig)
 - Git installieren: \<https://git-scm.com/downloads\>
