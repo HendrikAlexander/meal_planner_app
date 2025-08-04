@@ -1,4 +1,4 @@
-# Anleitung für das Team
+# GitHub Connection Guide
 GitHub-Repo mit VS Code verbinden
 
 **Projektname:** meal_planner_app  
@@ -6,8 +6,8 @@ GitHub-Repo mit VS Code verbinden
 https://github.com/HendrikAlexander/meal_planner_app
 
 ## Voraussetzungen (einmalig)
-- Git installieren: \<https://git-scm.com/downloads\>
-- VS Code installieren: \<https://code.visualstudio.com\>
+- Git installieren: https://git-scm.com/downloads
+- VS Code installieren: https://code.visualstudio.com
 - Optional: GitHub-Konto (für Push)
 
 **Test:**  
@@ -16,7 +16,7 @@ https://github.com/HendrikAlexander/meal_planner_app
 ## Schritt-für-Schritt: Projekt klonen
 
 1. **Repo-URL kopieren**  
-   \<https://github.com/HendrikAlexander/meal_planner_app\>
+   https://github.com/HendrikAlexander/meal_planner_app
 
 2. **VS Code öffnen**
 
@@ -58,7 +58,7 @@ Bei erstmaligem Push wirst du nach Authentifizierung gefragt.
 GitHub unterstützt keine Passwörter mehr beim Push – stattdessen brauchst du ein Personal Access Token (PAT).
 
 **So bekommst du deinen Token:**
-1. Rufe die Seite \<https://github.com/settings/tokens\> auf.
+1. Rufe die Seite https://github.com/settings/tokens auf.
 2. Wähle `Generate new token` (Classic oder Fine-grained).
 3. Aktiviere mind. die Rechte `repo`.
 4. Setze ein Ablaufdatum.
@@ -69,4 +69,4 @@ Beim Push in VS Code:
 - Passwort: dein kopierter Token
 
 **Offizielle Anleitung:**  
-\<https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token\>
+https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
