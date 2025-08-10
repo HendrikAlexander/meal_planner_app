@@ -1,16 +1,21 @@
 import 'dart:io'; // Für File
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb; // Plattformcheck (Web)
 import 'package:image_picker/image_picker.dart'; // Für Kamera
 import 'package:provider/provider.dart';
 import '../../model/essensbewertung.dart';
 import '../../viewmodel/essensbewertung_viewmodel.dart';
+import '../../model/essen.dart'; 
 
 /// Dialog zum Abgeben oder Bearbeiten einer Essensbewertung
 class AddBewertungDialog extends StatefulWidget {
   /// Falls vorhanden, wird diese Bewertung bearbeitet
   final Essensbewertung? vorhandeneBewertung;
 
-  const AddBewertungDialog({super.key, this.vorhandeneBewertung});
+  // NEU: Das Essen, das bewertet wird
+  final Essen? essen; // Das Ziel-Essen für diese Bewertung
+
+  const AddBewertungDialog({super.key, this.vorhandeneBewertung, this.essen});
 
   @override
   State<AddBewertungDialog> createState() => _AddBewertungDialogState();
@@ -18,8 +23,12 @@ class AddBewertungDialog extends StatefulWidget {
 
 class _AddBewertungDialogState extends State<AddBewertungDialog> {
   final TextEditingController _textController = TextEditingController();
+  final TextEditingController _autorController = TextEditingController(); // Autor-Name Controller
   int _selectedRating = 3;
-  File? _imageFile; // 📸 Bild-Datei (vom Nutzer aufgenommen)
+  File? _imageFile; // Bild-Datei (vom Nutzer aufgenommen)
+
+  // Nur echte Mobile-Plattformen: Android/iOS (kein Web, kein Desktop)
+  bool get _isMobile => !kIsWeb && (Platform.isAndroid || Platform.isIOS);
 
   @override
   void initState() {
@@ -28,20 +37,39 @@ class _AddBewertungDialogState extends State<AddBewertungDialog> {
     if (widget.vorhandeneBewertung != null) {
       _selectedRating = widget.vorhandeneBewertung!.essensbewertung;
       _textController.text = widget.vorhandeneBewertung!.essensbewertungstext;
+      _autorController.text = widget.vorhandeneBewertung!.erstelltVon; // 👤 Autor vorausfüllen
       if (widget.vorhandeneBewertung!.essensfoto.isNotEmpty) {
         _imageFile = File(widget.vorhandeneBewertung!.essensfoto);
       }
     }
   }
 
-  // 📷 Öffnet die Kamera und speichert das aufgenommene Bild
+  // Öffnet die Kamera und speichert das aufgenommene Bild
   Future<void> _bildAufnehmen() async {
+    if (!_isMobile) {
+      // Sicherheitsnetz: sollte nie sichtbar sein, aber falls doch:
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Fotoaufnahme ist nur auf Mobile verfügbar.')),
+        );
+      }
+      return;
+    }
+
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
+
     if (pickedFile != null) {
       setState(() {
         _imageFile = File(pickedFile.path);
       });
+    } else {
+      // Simulator hat meist keine Kamera → deutlicher Hinweis
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Kamera im Simulator nicht verfügbar. Bitte auf einem echten Gerät testen.')),
+        );
+      }
     }
   }
 
@@ -61,7 +89,7 @@ class _AddBewertungDialogState extends State<AddBewertungDialog> {
             items: [1, 2, 3, 4, 5].map((wert) {
               return DropdownMenuItem(
                 value: wert,
-                child: Text('$wert Sterne'),
+                child: Text('$wert Stern'),
               );
             }).toList(),
             onChanged: (value) {
@@ -80,18 +108,36 @@ class _AddBewertungDialogState extends State<AddBewertungDialog> {
               border: OutlineInputBorder(),
             ),
           ),
-          const SizedBox(height: 16),
-          // 📸 Kamera-Button und Bild-Vorschau
-          ElevatedButton.icon(
-            onPressed: _bildAufnehmen,
-            icon: const Icon(Icons.camera_alt),
-            label: const Text("Foto aufnehmen"),
-          ),
-          if (_imageFile != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: Image.file(_imageFile!, height: 100),
+          const SizedBox(height: 12),
+          // Textfeld für den Namen/Ersteller
+          TextField(
+            controller: _autorController,
+            decoration: const InputDecoration(
+              labelText: 'Dein Name (Ersteller)',
+              border: OutlineInputBorder(),
             ),
+          ),
+          const SizedBox(height: 16),
+
+          // Kamera-Button und Bild-Vorschau — NUR Mobile (Android/iOS)
+          if (_isMobile) ...[
+            ElevatedButton.icon(
+              onPressed: _bildAufnehmen,
+              icon: const Icon(Icons.camera_alt),
+              label: const Text("Foto aufnehmen"),
+            ),
+            if (_imageFile != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Image.file(_imageFile!, height: 100),
+              ),
+          ] else ...[
+            // Hinweis für Web/Desktop
+            const Text(
+              'Fotoaufnahme ist nur auf Mobile (Android/iOS) verfügbar.',
+              style: TextStyle(fontStyle: FontStyle.italic),
+            ),
+          ],
         ],
       ),
       actions: [
@@ -105,18 +151,20 @@ class _AddBewertungDialogState extends State<AddBewertungDialog> {
           onPressed: () {
             // Neue Bewertung erstellen
             final neueBewertung = Essensbewertung(
-              essensfoto: _imageFile?.path ?? '', // ✅ Bildpfad speichern
+              essenName: widget.essen?.name ?? widget.vorhandeneBewertung!.essenName, // Essen-Name
+              essensfoto: _isMobile ? (_imageFile?.path ?? '') : '', // Nur Mobile speichert Pfad
               essensbewertung: _selectedRating,
               essensbewertungstext: _textController.text,
+              erstelltVon: _autorController.text.trim(), // Autor speichern
             );
 
             if (widget.vorhandeneBewertung == null) {
-              // ➕ Neue Bewertung → direkt in ViewModel speichern
+              // Neue Bewertung → direkt in ViewModel speichern
               Provider.of<EssensbewertungViewModel>(context, listen: false)
                   .bewertungHinzufuegen(neueBewertung);
               Navigator.pop(context); // schließen ohne Rückgabe
             } else {
-              // ✏️ Existierende Bewertung → Rückgabe an Aufrufer
+              // Existierende Bewertung → Rückgabe an Aufrufer
               Navigator.pop(context, neueBewertung);
             }
           },

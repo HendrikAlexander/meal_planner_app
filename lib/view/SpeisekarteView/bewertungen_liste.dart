@@ -1,3 +1,5 @@
+// lib/view/SpeisekarteView/bewertungen_liste.dart
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -28,10 +30,13 @@ class BewertungenListe extends StatelessWidget {
                 return Card(
                   margin: const EdgeInsets.all(8.0),
                   child: ListTile(
-                    title: Text('Bewertung: ${bewertung.essensbewertung} Sterne'),
+                    title: Text('Bewertung: ${bewertung.essensbewertung} Stern'),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Essen-Name anzeigen
+                        Text('Essen: ${bewertung.essenName}'),
+                        Text('Erstellt von: ${bewertung.erstelltVon}'),
                         Text('Kommentar: ${bewertung.essensbewertungstext}'),
                         const SizedBox(height: 8),
                         // 📸 Zeige Bild, falls vorhanden
@@ -43,7 +48,7 @@ class BewertungenListe extends StatelessWidget {
                           ),
                       ],
                     ),
-                    // 🖊️ Button zum Bearbeiten
+                    //Button zum Bearbeiten
                     trailing: IconButton(
                       icon: const Icon(Icons.edit),
                       onPressed: () async {
