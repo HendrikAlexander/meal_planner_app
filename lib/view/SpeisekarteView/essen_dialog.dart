@@ -1,4 +1,4 @@
-// lib/view/essen_dialog.dart
+// lib/view/SpeisekarteView/essen_dialog.dart
 
 import 'package:flutter/material.dart';
 import '../../model/essen.dart';
@@ -6,9 +6,6 @@ import '../../model/essens_art.dart';
 import '../../viewmodel/SpeisekarteViewModel/essen_viewmodel.dart';
 import 'add_essen_dialog.dart';
 
-/// Bildschirm zur Anzeige und Verwaltung der Speisekarte
-/// Hier können neue Essen hinzugefügt, bearbeitet, gelöscht
-/// und Bewertungen abgegeben werden.
 class EssenDialog extends StatefulWidget {
   const EssenDialog({super.key});
 
@@ -17,44 +14,42 @@ class EssenDialog extends StatefulWidget {
 }
 
 class _EssenDialogState extends State<EssenDialog> {
-  // ViewModel verwaltet die Liste der Essen
   final EssenViewModel viewModel = EssenViewModel();
 
-  /// Öffnet den Dialog zum Hinzufügen eines neuen Essens
   void _einNeuesEssenHinzufuegen() async {
     final neuesEssen = await showDialog<Essen>(
       context: context,
       builder: (BuildContext context) {
-        // Dialog im "Erstellen"-Modus → kein Essen übergeben
         return const AddEssenDialog();
       },
     );
     if (neuesEssen != null) {
       setState(() {
-        // Neues Essen ins ViewModel hinzufügen
         viewModel.addEssen(neuesEssen);
       });
     }
   }
 
-  /// Öffnet den Dialog zum Bearbeiten eines bestehenden Essens
+  // MODIFIED: This function now handles the "DELETE" signal
   void _einEssenBearbeiten(Essen altesEssen, int index) async {
-    final geaendertesEssen = await showDialog<Essen>(
+    final result = await showDialog( // result can be Essen, String, or null
       context: context,
       builder: (BuildContext context) {
-        // Dialog im "Bearbeiten"-Modus → aktuelles Essen übergeben
         return AddEssenDialog(essen: altesEssen);
       },
     );
-    if (geaendertesEssen != null) {
+
+    if (result == null) return; // User canceled
+
+    if (result == 'DELETE_ACTION') {
+      _einEssenLoeschen(altesEssen);
+    } else if (result is Essen) {
       setState(() {
-        // Geändertes Essen im ViewModel aktualisieren
-        viewModel.updateEssen(index, geaendertesEssen);
+        viewModel.updateEssen(index, result);
       });
     }
   }
 
-  /// Löscht ein Essen aus der Liste
   void _einEssenLoeschen(Essen essen) {
     setState(() {
       viewModel.deleteEssen(essen);
@@ -73,18 +68,16 @@ class _EssenDialogState extends State<EssenDialog> {
           final essen = viewModel.essenListe[index];
           return Dismissible(
             key: Key(essen.name + index.toString()),
-            direction: DismissDirection.endToStart, // Nur von rechts nach links
+            direction: DismissDirection.endToStart,
             background: Container(
               color: Colors.red,
               alignment: Alignment.centerRight,
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: const Icon(Icons.delete, color: Colors.white),
             ),
-            // Wenn Wischen abgeschlossen ist → Essen löschen
             onDismissed: (direction) {
               _einEssenLoeschen(essen);
             },
-            // Sicherheitsabfrage vor dem Löschen
             confirmDismiss: (direction) async {
               return await showDialog<bool>(
                 context: context,
@@ -107,10 +100,9 @@ class _EssenDialogState extends State<EssenDialog> {
               );
             },
             child: ListTile(
-              title: Text(essen.name), // Name des Essens
-              subtitle: Text(essen.art.anzeigeName), // Art des Essens (z. B. vegetarisch)
+              title: Text(essen.name),
+              subtitle: Text(essen.art.anzeigeName),
               trailing: Text('${essen.preis.toStringAsFixed(2)} €'),
-              // Tippen auf die Kachel → Essen bearbeiten
               onTap: () {
                 _einEssenBearbeiten(essen, index);
               },

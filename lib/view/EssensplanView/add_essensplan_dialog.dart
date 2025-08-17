@@ -29,24 +29,27 @@ class _AddEssensplanDialogState extends State<AddEssensplanDialog> {
     }
   }
 
-  // GEÄNDERT: Die Logik zum Bearbeiten wurde vereinfacht.
+  // MODIFIED: This function now handles the "DELETE" signal
   void _gerichtBearbeiten(Essen altesEssen) async {
-    // Merken uns den alten Namen, falls er sich ändert.
     final alterName = altesEssen.name;
     final warAusgewaehlt = _ausgewaehlteEssensNamen.contains(alterName);
 
-    // Wir rufen den Bearbeiten-Dialog auf. Er verändert das "altesEssen"-Objekt direkt.
-    await showDialog<Essen>(
+    final result = await showDialog( // result can be Essen, String, or null
       context: context,
       builder: (context) => AddEssenDialog(essen: altesEssen),
     );
 
-    // Jetzt aktualisieren wir nur noch unsere lokale Anzeige und die Auswahlliste.
+    if (result == null) return;
+
     setState(() {
-      if (warAusgewaehlt) {
-        // Wenn der Name geändert wurde, müssen wir unsere Auswahlliste anpassen.
-        _ausgewaehlteEssensNamen.remove(alterName);
-        _ausgewaehlteEssensNamen.add(altesEssen.name);
+      if (result == 'DELETE_ACTION') {
+        _ausgewaehlteEssensNamen.remove(altesEssen.name);
+        _datenbank.deleteEssen(altesEssen);
+      } else if (result is Essen) {
+        if (warAusgewaehlt) {
+          _ausgewaehlteEssensNamen.remove(alterName);
+          _ausgewaehlteEssensNamen.add(result.name);
+        }
       }
     });
   }
@@ -75,9 +78,7 @@ class _AddEssensplanDialogState extends State<AddEssensplanDialog> {
                   onChanged: (bool? isChecked) {
                     setState(() {
                       if (isChecked == true) {
-                        if (_ausgewaehlteEssensNamen.length < 5) {
-                          _ausgewaehlteEssensNamen.add(essen.name);
-                        }
+                        if (_ausgewaehlteEssensNamen.length < 5) { _ausgewaehlteEssensNamen.add(essen.name); }
                       } else {
                         _ausgewaehlteEssensNamen.remove(essen.name);
                       }
