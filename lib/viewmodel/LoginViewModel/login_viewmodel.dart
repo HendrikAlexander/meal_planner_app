@@ -20,6 +20,7 @@ class LoginViewModel extends ChangeNotifier {
   // NEUE FUNKTION: Meldet den Benutzer als Gast an.
   void loginAsGuest() {
     loggedInUser = AppUser(username: 'Gast', role: UserRole.user);
+    selectedRole = UserRole.user;
     notifyListeners();
   }
 
