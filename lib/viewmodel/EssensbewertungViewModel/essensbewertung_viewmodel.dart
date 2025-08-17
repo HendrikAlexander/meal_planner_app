@@ -21,4 +21,11 @@ class EssensbewertungViewModel extends ChangeNotifier {
     _bewertungen[index] = neueBewertung;
     notifyListeners();
   }
+
+  /// Entfernt eine Bewertung an einer bestimmten Position
+  void bewertungEntfernen(int index) {
+      _bewertungen.removeAt(index);
+      notifyListeners();
+  }
+  
 }

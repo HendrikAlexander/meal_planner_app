@@ -8,6 +8,8 @@ class LoginViewModel extends ChangeNotifier {
 
   AppUser? loggedInUser;
 
+  get currentRole => selectedRole;
+
   void login() {
     if (username.isNotEmpty && selectedRole != null) {
       loggedInUser = AppUser(username: username, role: selectedRole!);

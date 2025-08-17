@@ -1,6 +1,9 @@
 // lib/view/SpeisekarteView/essen_dialog.dart
 
 import 'package:flutter/material.dart';
+import 'package:meal_planner_app/model/user.dart';
+import 'package:meal_planner_app/viewmodel/LoginViewModel/login_viewmodel.dart';
+import 'package:provider/provider.dart';
 import '../../model/essen.dart';
 import '../../model/essens_art.dart';
 import '../../viewmodel/SpeisekarteViewModel/essen_viewmodel.dart';
@@ -32,7 +35,8 @@ class _EssenDialogState extends State<EssenDialog> {
 
   // MODIFIED: This function now handles the "DELETE" signal
   void _einEssenBearbeiten(Essen altesEssen, int index) async {
-    final result = await showDialog( // result can be Essen, String, or null
+    final result = await showDialog(
+      // result can be Essen, String, or null
       context: context,
       builder: (BuildContext context) {
         return AddEssenDialog(essen: altesEssen);
@@ -58,56 +62,70 @@ class _EssenDialogState extends State<EssenDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final isAdmin =
+        Provider.of<LoginViewModel>(context, listen: false).currentRole ==
+        UserRole.admin;
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Speisekarte'),
-      ),
+      appBar: AppBar(title: const Text('Speisekarte')),
       body: ListView.builder(
         itemCount: viewModel.essenListe.length,
         itemBuilder: (context, index) {
           final essen = viewModel.essenListe[index];
-          return Dismissible(
-            key: Key(essen.name + index.toString()),
-            direction: DismissDirection.endToStart,
-            background: Container(
-              color: Colors.red,
-              alignment: Alignment.centerRight,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: const Icon(Icons.delete, color: Colors.white),
-            ),
-            onDismissed: (direction) {
-              _einEssenLoeschen(essen);
-            },
-            confirmDismiss: (direction) async {
-              return await showDialog<bool>(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text('Bestätigung'),
-                    content: Text('Möchten Sie "${essen.name}" wirklich löschen?'),
-                    actions: <Widget>[
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(false),
-                        child: const Text('Abbrechen'),
+          if (isAdmin) {
+            // Admins dürfen löschen
+            return Dismissible(
+              key: Key(essen.name + index.toString()),
+              direction: DismissDirection.endToStart,
+              background: Container(
+                color: Colors.red,
+                alignment: Alignment.centerRight,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: const Icon(Icons.delete, color: Colors.white),
+              ),
+              onDismissed: (direction) {
+                _einEssenLoeschen(essen);
+              },
+              confirmDismiss: (direction) async {
+                return await showDialog<bool>(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Bestätigung'),
+                      content: Text(
+                        'Möchten Sie "${essen.name}" wirklich löschen?',
                       ),
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(true),
-                        child: const Text('Löschen'),
-                      ),
-                    ],
-                  );
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(false),
+                          child: const Text('Abbrechen'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(true),
+                          child: const Text('Löschen'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              child: ListTile(
+                title: Text(essen.name),
+                subtitle: Text(essen.art.anzeigeName),
+                trailing: Text('${essen.preis.toStringAsFixed(2)} €'),
+                onTap: () {
+                  _einEssenBearbeiten(essen, index);
                 },
-              );
-            },
-            child: ListTile(
+              ),
+            );
+          } else {
+            // Nur lesender Zugriff für Nicht-Admins
+            return ListTile(
               title: Text(essen.name),
               subtitle: Text(essen.art.anzeigeName),
               trailing: Text('${essen.preis.toStringAsFixed(2)} €'),
-              onTap: () {
-                _einEssenBearbeiten(essen, index);
-              },
-            ),
-          );
+            );
+          }
         },
       ),
       floatingActionButton: FloatingActionButton(

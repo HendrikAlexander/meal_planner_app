@@ -2,6 +2,8 @@
 
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:meal_planner_app/model/user.dart';
+import 'package:meal_planner_app/viewmodel/LoginViewModel/login_viewmodel.dart';
 import 'package:provider/provider.dart';
 import '../../viewmodel/EssensbewertungViewModel/essensbewertung_viewmodel.dart';
 import '../../model/essensbewertung.dart';
@@ -15,6 +17,7 @@ class BewertungenListe extends StatelessWidget {
   Widget build(BuildContext context) {
     final bewertungenViewModel = Provider.of<EssensbewertungViewModel>(context);
     final bewertungen = bewertungenViewModel.bewertungen;
+    final isAdmin = Provider.of<LoginViewModel>(context, listen: false).currentRole == UserRole.admin;
 
     return Scaffold(
       appBar: AppBar(
@@ -48,22 +51,54 @@ class BewertungenListe extends StatelessWidget {
                           ),
                       ],
                     ),
-                    //Button zum Bearbeiten
-                    trailing: IconButton(
-                      icon: const Icon(Icons.edit),
-                      onPressed: () async {
-                        final neueBewertung = await showDialog<Essensbewertung>(
-                          context: context,
-                          builder: (context) => AddBewertungDialog(
-                            vorhandeneBewertung: bewertung,
-                          ),
-                        );
+                    // Nur Admins können Bewertungen bearbeiten und löschen
+                    trailing: isAdmin
+                        ? Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () async {
+                                  final neueBewertung = await showDialog<Essensbewertung>(
+                                    context: context,
+                                    builder: (context) => AddBewertungDialog(
+                                      vorhandeneBewertung: bewertung,
+                                    ),
+                                  );
 
-                        if (neueBewertung != null) {
-                          bewertungenViewModel.bewertungAendern(index, neueBewertung);
-                        }
-                      },
-                    ),
+                                  if (neueBewertung != null) {
+                                    bewertungenViewModel.bewertungAendern(index, neueBewertung);
+                                  }
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: const Text('Bewertung löschen'),
+                                      content: const Text('Möchten Sie diese Bewertung wirklich löschen?'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context),
+                                          child: const Text('Abbrechen'),
+                                        ),
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            bewertungenViewModel.bewertungEntfernen(index);
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text('Löschen'),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          )
+                        : null
                   ),
                 );
               },
