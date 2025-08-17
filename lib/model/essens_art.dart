@@ -17,8 +17,6 @@ extension EssensArtExtension on EssensArt {
         return 'Vegan';
       case EssensArt.mitFleisch:
         return 'Mit Fleisch';
-      default:
-        return '';
-    }
+      }
   }
 }

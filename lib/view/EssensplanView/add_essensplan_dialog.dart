@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import '../../model/essen.dart';
-import '../../model/essens_art.dart';
 import '../../model/essens_datenbank.dart';
 import '../../model/essensplan.dart';
 import '../SpeisekarteView/add_essen_dialog.dart';
@@ -89,7 +88,7 @@ class _AddEssensplanDialogState extends State<AddEssensplanDialog> {
                   onPressed: () => _gerichtBearbeiten(essen),
                 ),
               );
-            }).toList(),
+            }),
           ],
         ),
       ),
