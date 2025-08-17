@@ -7,7 +7,6 @@ import '../../viewmodel/EssensplanViewModel/essensplan_viewmodel.dart';
 import 'add_essensplan_dialog.dart';
 import '../SpeisekarteView/add_bewertung_dialog.dart';
 
-
 class EssensplanDialog extends StatefulWidget {
   const EssensplanDialog({super.key});
 
@@ -99,10 +98,6 @@ class _EssensplanDialogState extends State<EssensplanDialog> {
               itemCount: _gefiltertePlaene.length,
               itemBuilder: (context, index) {
                 final plan = _gefiltertePlaene[index];
-                final gerichteText = plan.essenProWoche
-                    .map((essen) =>
-                        '- ${essen.name} (${essen.art.anzeigeName}) - ${essen.preis.toStringAsFixed(2)} €')
-                    .join('\n');
 
                 return Dismissible(
                   key: Key(plan.wochennummer.toString() + plan.essenProWoche.toString()),
@@ -133,24 +128,43 @@ class _EssensplanDialogState extends State<EssensplanDialog> {
                   },
                   child: Card(
                     margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    child: ListTile(
-                      title: Text('Woche ${plan.wochennummer}',
-                          style: const TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Text(gerichteText),
-                      trailing: IconButton(
-  icon: const Icon(Icons.rate_review),
-  tooltip: 'Bewertung abgeben',
-  onPressed: () {
-    showDialog(
-      context: context,
-      builder: (context) => const AddBewertungDialog(),
-    );
-  },
-),
-
-                      onTap: () {
-                        _einenPlanBearbeiten(plan);
-                      },
+                    // 🔽 Statt eines einfachen ListTile jetzt eine ExpansionTile:
+                    child: ExpansionTile(
+                      title: Text(
+                        'Woche ${plan.wochennummer}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      // 📌 Für jedes Essen der Woche eine eigene Zeile mit Bewertungs-Button
+                      children: [
+                        ...plan.essenProWoche.map((essen) => ListTile(
+                              title: Text(essen.name),
+                              subtitle: Text(
+                                '${essen.art.anzeigeName} – ${essen.preis.toStringAsFixed(2)} €',
+                              ),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.rate_review),
+                                tooltip: 'Bewertung abgeben',
+                                onPressed: () {
+                                  // ⚠️ Bewertung ESSEN-bezogen anlegen
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AddBewertungDialog(
+                                      essen: essen,
+                                    ),
+                                  );
+                                },
+                              ),
+                            )),
+                        // 🔧 Optional: Plan schnell bearbeiten
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton.icon(
+                            onPressed: () => _einenPlanBearbeiten(plan),
+                            icon: const Icon(Icons.edit),
+                            label: const Text('Plan bearbeiten'),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 );

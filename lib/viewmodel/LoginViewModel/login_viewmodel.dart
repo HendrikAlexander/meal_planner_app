@@ -11,8 +11,14 @@ class LoginViewModel extends ChangeNotifier {
   void login() {
     if (username.isNotEmpty && selectedRole != null) {
       loggedInUser = AppUser(username: username, role: selectedRole!);
-      notifyListeners(); // In echter App: zur Navigation oder Statusanzeige
+      notifyListeners();
     }
+  }
+
+  // NEUE FUNKTION: Meldet den Benutzer als Gast an.
+  void loginAsGuest() {
+    loggedInUser = AppUser(username: 'Gast', role: UserRole.user);
+    notifyListeners();
   }
 
   void setUsername(String value) {

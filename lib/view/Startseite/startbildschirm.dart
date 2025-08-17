@@ -44,6 +44,16 @@ class Startbildschirm extends StatelessWidget {
               Navigator.pushNamed(context, '/bewertungen');
             },
           ),
+                    const Divider(), // ERGÄNZUNG
+          // ERGÄNZUNG: KACHEL FÜR DEN LOGIN
+          ListTile(
+            leading: const Icon(Icons.login),
+            title: const Text('Login'),
+            subtitle: const Text('Anmelden, als Admin oder Nutzer'),
+            onTap: () {
+              Navigator.pushNamed(context, '/login');
+            },
+          ),
         ],
       ),
     );

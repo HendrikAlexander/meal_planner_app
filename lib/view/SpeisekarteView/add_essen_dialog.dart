@@ -64,21 +64,28 @@ class _AddEssenDialogState extends State<AddEssenDialog> {
         ],
       ),
       actions: [
+        // NEW: "Löschen" button, only visible in edit mode
+        if (widget.essen != null)
+          TextButton(
+            onPressed: () {
+              // Closes the dialog and sends the "DELETE" signal
+              Navigator.of(context).pop('DELETE_ACTION');
+            },
+            child: const Text('Löschen', style: TextStyle(color: Colors.red)),
+          ),
+        const Spacer(),
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
           child: const Text('Abbrechen'),
         ),
         ElevatedButton(
           onPressed: () {
-            // GEÄNDERT: Die Logik zum Speichern wurde angepasst.
             if (widget.essen != null) {
-              // Bearbeiten-Modus: Wir verändern das bestehende Objekt.
               widget.essen!.name = _nameController.text;
               widget.essen!.preis = double.tryParse(_preisController.text) ?? 0.0;
               widget.essen!.art = _ausgewaehlteArt;
               Navigator.of(context).pop(widget.essen);
             } else {
-              // Erstellen-Modus: Wir erstellen ein neues Objekt.
               final neuesEssen = Essen(
                 name: _nameController.text,
                 preis: double.tryParse(_preisController.text) ?? 0.0,

@@ -12,12 +12,12 @@ class LoginView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text("Login")),
-      body: SingleChildScrollView( // <-- NEU: Scrollbarer Bereich
+      body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
-            mainAxisSize: MainAxisSize.min, // Verhindert „unendliche“ Höhe
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch, // Lässt Buttons die volle Breite einnehmen
             children: [
               TextField(
                 decoration: const InputDecoration(labelText: "Benutzername"),
@@ -32,6 +32,7 @@ class LoginView extends StatelessWidget {
               const SizedBox(height: 10),
               DropdownButton<UserRole>(
                 value: vm.selectedRole,
+                isExpanded: true, // Nimmt die volle Breite ein
                 hint: const Text("Rolle auswählen"),
                 items: UserRole.values.map((role) {
                   return DropdownMenuItem(
@@ -50,6 +51,17 @@ class LoginView extends StatelessWidget {
                   }
                 },
                 child: const Text("Einloggen"),
+              ),
+              const SizedBox(height: 10),
+              // NEUER BUTTON: Für den Gast-Login
+              TextButton(
+                onPressed: () {
+                  // Ruft die neue ViewModel-Funktion auf
+                  vm.loginAsGuest();
+                  // Navigiert direkt zur Startseite
+                  Navigator.pushReplacementNamed(context, '/');
+                },
+                child: const Text("Als Gast fortfahren"),
               ),
             ],
           ),

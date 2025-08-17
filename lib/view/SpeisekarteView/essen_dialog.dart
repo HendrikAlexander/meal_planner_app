@@ -1,4 +1,4 @@
-// lib/view/essen_dialog.dart
+// lib/view/SpeisekarteView/essen_dialog.dart
 
 import 'package:flutter/material.dart';
 import '../../model/essen.dart';
@@ -20,7 +20,6 @@ class _EssenDialogState extends State<EssenDialog> {
     final neuesEssen = await showDialog<Essen>(
       context: context,
       builder: (BuildContext context) {
-        // Ruft den Dialog im "Erstellen"-Modus auf (ohne Essen-Objekt)
         return const AddEssenDialog();
       },
     );
@@ -31,18 +30,22 @@ class _EssenDialogState extends State<EssenDialog> {
     }
   }
 
-  // NEUE FUNKTION: Öffnet den Dialog zum Bearbeiten eines Essens
+  // MODIFIED: This function now handles the "DELETE" signal
   void _einEssenBearbeiten(Essen altesEssen, int index) async {
-    final geaendertesEssen = await showDialog<Essen>(
+    final result = await showDialog( // result can be Essen, String, or null
       context: context,
       builder: (BuildContext context) {
-        // Ruft den Dialog im "Bearbeiten"-Modus auf und übergibt das vorhandene Essen
         return AddEssenDialog(essen: altesEssen);
       },
     );
-    if (geaendertesEssen != null) {
+
+    if (result == null) return; // User canceled
+
+    if (result == 'DELETE_ACTION') {
+      _einEssenLoeschen(altesEssen);
+    } else if (result is Essen) {
       setState(() {
-        viewModel.updateEssen(index, geaendertesEssen);
+        viewModel.updateEssen(index, result);
       });
     }
   }
@@ -83,8 +86,14 @@ class _EssenDialogState extends State<EssenDialog> {
                     title: const Text('Bestätigung'),
                     content: Text('Möchten Sie "${essen.name}" wirklich löschen?'),
                     actions: <Widget>[
-                      TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Abbrechen')),
-                      TextButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Löschen')),
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text('Abbrechen'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        child: const Text('Löschen'),
+                      ),
                     ],
                   );
                 },
@@ -94,7 +103,6 @@ class _EssenDialogState extends State<EssenDialog> {
               title: Text(essen.name),
               subtitle: Text(essen.art.anzeigeName),
               trailing: Text('${essen.preis.toStringAsFixed(2)} €'),
-              // NEU: Fügt die "Tippen"-Aktion hinzu
               onTap: () {
                 _einEssenBearbeiten(essen, index);
               },
