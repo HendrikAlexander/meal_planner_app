@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../model/essensbewertung.dart';
 import '../../model/essen.dart'; // Damit der Dialog weiß, welches Essen bewertet wird
-import '../../viewmodel/essensbewertung_viewmodel.dart';
+import '../../viewmodel/EssensbewertungViewModel/essensbewertung_viewmodel.dart';
 import '../../viewmodel/LoginViewModel/login_viewmodel.dart';
 
 /// Dialog zum Abgeben oder Bearbeiten einer Essensbewertung

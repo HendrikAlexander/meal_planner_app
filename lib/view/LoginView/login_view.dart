@@ -11,7 +11,7 @@ class LoginView extends StatelessWidget {
     final vm = Provider.of<LoginViewModel>(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Login")),
+      appBar: AppBar(title: const Text("Login"),automaticallyImplyLeading: false),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20),

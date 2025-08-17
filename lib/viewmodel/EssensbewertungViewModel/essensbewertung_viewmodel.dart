@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../model/essensbewertung.dart';
+import '../../model/essensbewertung.dart';
 
 /// ViewModel zur Verwaltung von Essensbewertungen.
 /// Diese Klasse hält eine Liste von Bewertungen und informiert das UI bei Änderungen.

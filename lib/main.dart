@@ -8,7 +8,7 @@ import 'view/SpeisekarteView/essen_dialog.dart';
 import 'view/Startseite/startbildschirm.dart';
 import 'view/EssensplanView/essensplan_dialog.dart';
 import 'view/SpeisekarteView/bewertungen_liste.dart';
-import 'viewmodel/essensbewertung_viewmodel.dart';
+import 'viewmodel/EssensbewertungViewModel/essensbewertung_viewmodel.dart';
 
 // NEU: Login-View + ViewModel importieren
 import 'view/LoginView/login_view.dart';
@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
         useMaterial3: true,
       ),
-      initialRoute: '/', // <-- NEU: Login zuerst anzeigen
+      initialRoute: '/login', // <-- NEU: Login zuerst anzeigen
       routes: {
         '/': (context) => const Startbildschirm(),
         '/login': (context) => const LoginView(),

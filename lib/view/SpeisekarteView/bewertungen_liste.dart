@@ -3,7 +3,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../viewmodel/essensbewertung_viewmodel.dart';
+import '../../viewmodel/EssensbewertungViewModel/essensbewertung_viewmodel.dart';
 import '../../model/essensbewertung.dart';
 import 'add_bewertung_dialog.dart';
 

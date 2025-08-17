@@ -51,7 +51,7 @@ class Startbildschirm extends StatelessWidget {
             title: const Text('Login'),
             subtitle: const Text('Anmelden, als Admin oder Nutzer'),
             onTap: () {
-              Navigator.pushNamed(context, '/login');
+              Navigator.pushReplacementNamed(context, '/login');
             },
           ),
         ],
