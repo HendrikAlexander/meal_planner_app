@@ -8,7 +8,7 @@ import '../../model/essens_art.dart';
 import '../../model/essensplan.dart';
 import '../../viewmodel/EssensplanViewModel/essensplan_viewmodel.dart';
 import 'add_essensplan_dialog.dart';
-import '../SpeisekarteView/add_bewertung_dialog.dart';
+import '../EssensbewertungView/add_bewertung_dialog.dart';
 
 class EssensplanDialog extends StatefulWidget {
   const EssensplanDialog({super.key});

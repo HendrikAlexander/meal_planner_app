@@ -102,7 +102,7 @@ class _AddBewertungDialogState extends State<AddBewertungDialog> {
             items: [1, 2, 3, 4, 5].map((wert) {
               return DropdownMenuItem(
                 value: wert,
-                child: Text('$wert Stern'),
+                child: Text('$wert Sterne'),
               );
             }).toList(),
             onChanged: (value) {

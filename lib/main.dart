@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'view/SpeisekarteView/essen_dialog.dart';
 import 'view/Startseite/startbildschirm.dart';
 import 'view/EssensplanView/essensplan_dialog.dart';
-import 'view/SpeisekarteView/bewertungen_liste.dart';
+import 'view/EssensbewertungView/bewertung_dialog.dart';
 import 'viewmodel/EssensbewertungViewModel/essensbewertung_viewmodel.dart';
 
 // NEU: Login-View + ViewModel importieren
@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginView(),
         '/speisekarte': (context) => const EssenDialog(),
         '/essensplan': (context) => const EssensplanDialog(),
-        '/bewertungen': (context) => const BewertungenListe(),
+        '/bewertungen': (context) => const BewertungDialog(),
       },
     );
   }

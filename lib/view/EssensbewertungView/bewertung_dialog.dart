@@ -1,4 +1,4 @@
-// lib/view/SpeisekarteView/bewertungen_liste.dart
+// lib/view/EssensbewertungView/bewertung_dialog.dart
 
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -10,8 +10,8 @@ import '../../model/essensbewertung.dart';
 import 'add_bewertung_dialog.dart';
 
 /// Ansicht zur Anzeige aller abgegebenen Bewertungen mit Bearbeitungsfunktion
-class BewertungenListe extends StatelessWidget {
-  const BewertungenListe({super.key});
+class BewertungDialog extends StatelessWidget {
+  const BewertungDialog({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,7 @@ class BewertungenListe extends StatelessWidget {
                 return Card(
                   margin: const EdgeInsets.all(8.0),
                   child: ListTile(
-                    title: Text('Bewertung: ${bewertung.essensbewertung} Stern'),
+                    title: Text('Bewertung: ${bewertung.essensbewertung} Sterne'),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
