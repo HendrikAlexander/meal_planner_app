@@ -1,20 +1,14 @@
 // lib/view/SpeisekarteView/essen_dialog.dart
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
 import 'package:meal_planner_app/model/user.dart';
 import 'package:meal_planner_app/viewmodel/LoginViewModel/login_viewmodel.dart';
-
+import 'package:provider/provider.dart';
 import '../../model/essen.dart';
 import '../../model/essens_art.dart';
 import '../../viewmodel/SpeisekarteViewModel/essen_viewmodel.dart';
-import '../EssensbewertungView/add_bewertung_dialog.dart';
 import 'add_essen_dialog.dart';
 
-/// Bildschirm zur Anzeige und Verwaltung der Speisekarte
-/// Hier können neue Essen hinzugefügt, bearbeitet, gelöscht
-/// und Bewertungen abgegeben werden.
 class EssenDialog extends StatefulWidget {
   const EssenDialog({super.key});
 
@@ -23,27 +17,23 @@ class EssenDialog extends StatefulWidget {
 }
 
 class _EssenDialogState extends State<EssenDialog> {
-  // ViewModel verwaltet die Liste der Essen
   final EssenViewModel viewModel = EssenViewModel();
 
-  /// Öffnet den Dialog zum Hinzufügen eines neuen Essens
   void _einNeuesEssenHinzufuegen() async {
     final neuesEssen = await showDialog<Essen>(
       context: context,
       builder: (BuildContext context) {
-        // Dialog im "Erstellen"-Modus → kein Essen übergeben
         return const AddEssenDialog();
       },
     );
     if (neuesEssen != null) {
       setState(() {
-        // Neues Essen ins ViewModel hinzufügen
         viewModel.addEssen(neuesEssen);
       });
     }
   }
 
-  /// Öffnet den Dialog zum Bearbeiten eines bestehenden Essens
+  // MODIFIED: This function now handles the "DELETE" signal
   void _einEssenBearbeiten(Essen altesEssen, int index) async {
     // Das Ergebnis des Dialogs abwarten. Es kann jetzt ein Essen, ein String oder null sein.
     final result = await showDialog(
@@ -70,7 +60,6 @@ class _EssenDialogState extends State<EssenDialog> {
     }
   }
 
-  /// Löscht ein Essen aus der Liste
   void _einEssenLoeschen(Essen essen) {
     setState(() {
       viewModel.deleteEssen(essen);
@@ -79,70 +68,39 @@ class _EssenDialogState extends State<EssenDialog> {
 
   @override
   Widget build(BuildContext context) {
-    // Rollenermittlung: Admin darf löschen (Swipe-to-Delete), alle dürfen bewerten
     final isAdmin =
         Provider.of<LoginViewModel>(context, listen: false).currentRole ==
-            UserRole.admin;
+        UserRole.admin;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Speisekarte'),
-      ),
+      appBar: AppBar(title: const Text('Speisekarte')),
       body: ListView.builder(
         itemCount: viewModel.essenListe.length,
         itemBuilder: (context, index) {
           final essen = viewModel.essenListe[index];
-
-          // Kachel-Inhalt: gemeinsam für Admin & Nicht-Admin
-          final tile = ListTile(
-            title: Text(essen.name),                  // Name des Essens
-            subtitle: Text(essen.art.anzeigeName),    // Art des Essens (z. B. vegetarisch)
-            // ⬇️ PREIS + BUTTON "Bewertung abgeben"
-            trailing: Wrap(
-              spacing: 8,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                Text('${essen.preis.toStringAsFixed(2)} €'), // Preis
-                IconButton(
-                  tooltip: 'Bewertung abgeben',
-                  icon: const Icon(Icons.rate_review),
-                  onPressed: () {
-                    // Bewertungsdialog öffnen und das aktuelle Essen mitgeben
-                    showDialog(
-                      context: context,
-                      builder: (context) => AddBewertungDialog(
-                        essen: essen, // wichtig: so wird essenName korrekt gespeichert
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-            // Tippen auf die Kachel → Essen bearbeiten
-            onTap: () {
-              _einEssenBearbeiten(essen, index);
-            },
-          );
-
           if (isAdmin) {
-            // Admins dürfen löschen (Swipe to delete)
+            // Admins dürfen löschen
             return Dismissible(
               key: Key(essen.name + index.toString()),
-              direction: DismissDirection.endToStart, // Nur von rechts nach links
+              direction: DismissDirection.endToStart,
               background: Container(
                 color: Colors.red,
                 alignment: Alignment.centerRight,
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: const Icon(Icons.delete, color: Colors.white),
               ),
-              // Sicherheitsabfrage vor dem Löschen
+              onDismissed: (direction) {
+                _einEssenLoeschen(essen);
+              },
               confirmDismiss: (direction) async {
                 return await showDialog<bool>(
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
                       title: const Text('Bestätigung'),
-                      content: Text('Möchten Sie "${essen.name}" wirklich löschen?'),
+                      content: Text(
+                        'Möchten Sie "${essen.name}" wirklich löschen?',
+                      ),
                       actions: <Widget>[
                         TextButton(
                           onPressed: () => Navigator.of(context).pop(false),
@@ -157,14 +115,24 @@ class _EssenDialogState extends State<EssenDialog> {
                   },
                 );
               },
-              onDismissed: (direction) {
-                _einEssenLoeschen(essen);
-              },
-              child: tile,
+              child: ListTile(
+                title: Text(essen.name),
+                subtitle: Text(essen.art.anzeigeName),
+                trailing: Text('${essen.preis.toStringAsFixed(2)} €'),
+                
+                onTap: () {
+                  _einEssenBearbeiten(essen, index);
+                },
+              ),
             );
           } else {
             // Nur lesender Zugriff für Nicht-Admins
-            return tile;
+            return ListTile(
+              title: Text(essen.name),
+              subtitle: Text(essen.art.anzeigeName),
+              trailing: Text('${essen.preis.toStringAsFixed(2)} €'),
+              
+            );
           }
         },
       ),
