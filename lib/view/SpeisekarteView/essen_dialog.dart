@@ -45,17 +45,27 @@ class _EssenDialogState extends State<EssenDialog> {
 
   /// Öffnet den Dialog zum Bearbeiten eines bestehenden Essens
   void _einEssenBearbeiten(Essen altesEssen, int index) async {
-    final geaendertesEssen = await showDialog<Essen>(
+    // Das Ergebnis des Dialogs abwarten. Es kann jetzt ein Essen, ein String oder null sein.
+    final result = await showDialog(
       context: context,
       builder: (BuildContext context) {
         // Dialog im "Bearbeiten"-Modus → aktuelles Essen übergeben
         return AddEssenDialog(essen: altesEssen);
       },
     );
-    if (geaendertesEssen != null) {
+
+    // Nichts tun, wenn der Benutzer auf "Abbrechen" geklickt hat (result ist dann null)
+    if (result == null) return;
+
+    // Prüfen, welches Ergebnis zurückkam (Löschen oder Bearbeiten)
+    if (result == 'DELETE_ACTION') {
+      // Wenn das Löschen-Signal kommt, die bereits existierende Löschen-Funktion aufrufen
+      _einEssenLoeschen(altesEssen);
+    } else if (result is Essen) {
+      // Wenn ein geändertes Essen zurückkommt, die UI mit dem neuen Objekt aktualisieren
       setState(() {
         // Geändertes Essen im ViewModel aktualisieren
-        viewModel.updateEssen(index, geaendertesEssen);
+        viewModel.updateEssen(index, result);
       });
     }
   }

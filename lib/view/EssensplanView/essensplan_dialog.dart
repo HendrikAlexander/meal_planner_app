@@ -69,22 +69,28 @@ class _EssensplanDialogState extends State<EssensplanDialog> {
     );
     if (geaenderterPlan != null) {
       viewModel.updateEssensplan(originalIndex, geaenderterPlan);
-      setState(() {
-        _allePlaene = viewModel.wochenplaene;
-      });
+      // HINWEIS: Die setState-Zeile hier war überflüssig und wurde entfernt,
+      // da _filterPlaene() bereits setState aufruft.
       _filterPlaene(); // Filter neu anwenden
     }
   }
 
-  void _einenPlanLoeschen(Essensplan plan) {
-    viewModel.deleteEssensplan(plan);
-    _filterPlaene(); // Filter neu anwenden
+ void _einenPlanLoeschen(Essensplan plan) {
+
+    setState(() {
+      viewModel.deleteEssensplan(plan);
+      _filterPlaene(); 
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final isAdmin = Provider.of<LoginViewModel>(context, listen: false).currentRole == UserRole.admin;
+    final loginVM = Provider.of<LoginViewModel>(context, listen: false);
+    final isAdmin = loginVM.loggedInUser?.role == UserRole.admin;
     
+    // Eine Liste mit den Wochentagen für die Anzeige
+    const wochentage = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'];
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Wochenpläne'),
@@ -107,106 +113,92 @@ class _EssensplanDialogState extends State<EssensplanDialog> {
               itemBuilder: (context, index) {
                 final plan = _gefiltertePlaene[index];
 
+                // Der Inhalt der Kachel, der für beide (Admin/User) gleich ist
+                final tileContent = ExpansionTile(
+                  title: Text(
+                    'Woche ${plan.wochennummer}',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  // KORRIGIERT: Wir bauen die Liste jetzt mit Index, um den Wochentag zuzuordnen
+                  children: [
+                    ...List.generate(plan.essenProWoche.length, (essenIndex) {
+                      final essen = plan.essenProWoche[essenIndex];
+                      // Wir stellen sicher, dass wir nicht mehr Wochentage als vorhanden zugreifen
+                      final wochentag = essenIndex < wochentage.length ? wochentage[essenIndex] : '';
+
+                      return ListTile(
+                        title: Text('${wochentag}: ${essen.name}'),
+                        subtitle: Text(
+                          '${essen.art.anzeigeName} – ${essen.preis.toStringAsFixed(2)} €',
+                        ),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.rate_review_outlined),
+                          tooltip: 'Bewertung abgeben',
+                          onPressed: () {
+                            // Annahme: AddBewertungDialog benötigt ein `essen`-Objekt
+                            showDialog(
+                              context: context,
+                              builder: (context) => AddBewertungDialog(essen: essen),
+                            );
+                          },
+                        ),
+                      );
+                    }),
+                    // Der "Bearbeiten"-Button wird nur für Admins innerhalb der ExpansionTile angezeigt
+                    if (isAdmin)
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton.icon(
+                          onPressed: () => _einenPlanBearbeiten(plan),
+                          icon: const Icon(Icons.edit),
+                          label: const Text('Plan bearbeiten'),
+                        ),
+                      ),
+                  ],
+                );
+
                 if (isAdmin) {
-    // Admins dürfen löschen
-    return Dismissible(
-      key: Key(plan.wochennummer.toString() + plan.essenProWoche.toString()),
-      direction: DismissDirection.endToStart,
-      background: Container(
-        color: Colors.red,
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: const Icon(Icons.delete, color: Colors.white),
-      ),
-      onDismissed: (direction) {
-        _einenPlanLoeschen(plan);
-      },
-      confirmDismiss: (direction) async {
-        return await showDialog<bool>(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Bestätigung'),
-              content: Text('Möchten Sie den Plan für Woche ${plan.wochennummer} wirklich löschen?'),
-              actions: <Widget>[
-                TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Abbrechen')),
-                TextButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Löschen')),
-              ],
-            );
-          },
-        );
-      },
-      child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: ExpansionTile(
-          title: Text(
-            'Woche ${plan.wochennummer}',
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          children: [
-            ...plan.essenProWoche.map((essen) => ListTile(
-              title: Text(essen.name),
-              subtitle: Text(
-                '${essen.art.anzeigeName} – ${essen.preis.toStringAsFixed(2)} €',
-              ),
-              trailing: IconButton(
-                icon: const Icon(Icons.rate_review),
-                tooltip: 'Bewertung abgeben',
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AddBewertungDialog(
-                      essen: essen,
+                  // Admins bekommen die Wisch-zum-Löschen-Funktion
+                  return Dismissible(
+                    key: Key(plan.wochennummer.toString() + plan.essenProWoche.toString()),
+                    direction: DismissDirection.endToStart,
+                    background: Container(
+                      color: Colors.red,
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: const Icon(Icons.delete, color: Colors.white),
+                    ),
+                    onDismissed: (direction) {
+                      _einenPlanLoeschen(plan);
+                    },
+                    confirmDismiss: (direction) async {
+                      return await showDialog<bool>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Bestätigung'),
+                            content: Text('Möchten Sie den Plan für Woche ${plan.wochennummer} wirklich löschen?'),
+                            actions: <Widget>[
+                              TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Abbrechen')),
+                              TextButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Löschen')),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    child: Card(
+                      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      child: tileContent,
                     ),
                   );
-                },
-              ),
-            )),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton.icon(
-                onPressed: () => _einenPlanBearbeiten(plan),
-                icon: const Icon(Icons.edit),
-                label: const Text('Plan bearbeiten'),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  } else {
-    // Nur lesender Zugriff für Nicht-Admins
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      child: ExpansionTile(
-        title: Text(
-          'Woche ${plan.wochennummer}',
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        children: [
-          ...plan.essenProWoche.map((essen) => ListTile(
-            title: Text(essen.name),
-            subtitle: Text(
-              '${essen.art.anzeigeName} – ${essen.preis.toStringAsFixed(2)} €',
-            ),
-            trailing: IconButton(
-              icon: const Icon(Icons.rate_review),
-              tooltip: 'Bewertung abgeben',
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => AddBewertungDialog(
-                    essen: essen,
-                  ),
-                );
+                } else {
+                  // Normale User sehen nur die Kachel ohne Wisch-Funktion
+                  return Card(
+                    margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    child: tileContent,
+                  );
+                }
               },
-            ),
-          )),
-        ],
-      ),
-    );
-  }
-},
             ),
           ),
         ],
