@@ -4,7 +4,7 @@ class Essensbewertung {
   final int essensbewertung;
   final String essensbewertungstext;
   final String essenName;
-    final String erstelltVon;    // 👤 Name/Benutzer, der die Bewertung abgegeben hat
+    final String erstelltVon;    // Name/Benutzer, der die Bewertung abgegeben hat
 
 
   Essensbewertung({

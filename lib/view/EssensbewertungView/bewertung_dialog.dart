@@ -42,7 +42,7 @@ class BewertungDialog extends StatelessWidget {
                         Text('Erstellt von: ${bewertung.erstelltVon}'),
                         Text('Kommentar: ${bewertung.essensbewertungstext}'),
                         const SizedBox(height: 8),
-                        // 📸 Zeige Bild, falls vorhanden
+                        // Zeige Bild, falls vorhanden
                         if (bewertung.essensfoto.isNotEmpty)
                           Image.file(
                             File(bewertung.essensfoto),
