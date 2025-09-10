@@ -27,6 +27,7 @@ class Startbildschirm extends StatelessWidget {
         title: const Text('Meal Planner'),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        automaticallyImplyLeading: false,
         // NEU: Die "actions"-Eigenschaft fügt Widgets auf der rechten Seite der AppBar hinzu.
         actions: [
           // Wir zeigen den Text nur an, wenn ein Benutzer eingeloggt ist.
