@@ -1,6 +1,8 @@
 // lib/view/EssensplanView/essensplan_dialog.dart
 
 import 'package:flutter/material.dart';
+import 'package:meal_planner_app/l10n/app_localizations.dart';
+import 'package:meal_planner_app/model/essens_datenbank.dart';
 import 'package:meal_planner_app/model/user.dart';
 import 'package:meal_planner_app/viewmodel/LoginViewModel/login_viewmodel.dart';
 import 'package:provider/provider.dart';
@@ -18,17 +20,18 @@ class EssensplanDialog extends StatefulWidget {
 }
 
 class _EssensplanDialogState extends State<EssensplanDialog> {
-  final viewModel = EssensplanViewModel();
-  late List<Essensplan> _allePlaene;
-  List<Essensplan> _gefiltertePlaene = [];
+// final viewModel = EssensplanViewModel();
+//late List<Essensplan> _allePlaene;
+//  List<Essensplan> _gefiltertePlaene = [];
   final _filterController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _allePlaene = viewModel.wochenplaene;
-    _gefiltertePlaene = _allePlaene;
-    _filterController.addListener(_filterPlaene);
+   // _allePlaene = viewModel.wochenplaene;
+   // _gefiltertePlaene = _allePlaene;
+  _filterController.addListener(() => setState(() {}));
+   // _filterController.addListener(_filterPlaene);
   }
 
   @override
@@ -37,32 +40,36 @@ class _EssensplanDialogState extends State<EssensplanDialog> {
     super.dispose();
   }
 
-  void _filterPlaene() {
-    final query = _filterController.text;
-    setState(() {
-      if (query.isEmpty) {
-        _gefiltertePlaene = _allePlaene;
-      } else {
-        _gefiltertePlaene = _allePlaene.where((plan) {
-          return plan.wochennummer.toString().contains(query);
-        }).toList();
-      }
-    });
-  }
+  //void _filterPlaene() {
+  //  final query = _filterController.text;
+   // setState(() {
+   //   if (query.isEmpty) {
+   //     _gefiltertePlaene = _allePlaene;
+   //   } else {
+    //    _gefiltertePlaene = _allePlaene.where((plan) {
+    //      return plan.wochennummer.toString().contains(query);
+    //    }).toList();
+    //  }
+   // });
+// }
 
   void _einenNeuenPlanHinzufuegen() async {
+    final viewModel = Provider.of<EssensplanViewModel>(context, listen: false);
     final neuerPlan = await showDialog<Essensplan>(
       context: context,
       builder: (context) => const AddEssensplanDialog(),
     );
     if (neuerPlan != null) {
       viewModel.addEssensplan(neuerPlan);
-      _filterPlaene(); // Filter neu anwenden
+      //_filterPlaene(); // Filter neu anwenden
     }
   }
 
   void _einenPlanBearbeiten(Essensplan alterPlan) async {
-    final originalIndex = _allePlaene.indexOf(alterPlan);
+    final viewModel = Provider.of<EssensplanViewModel>(context, listen: false);
+    // final originalIndex = _allePlaene.indexOf(alterPlan);
+    final originalIndex = viewModel.wochenplaene.indexOf(alterPlan);
+
     final geaenderterPlan = await showDialog<Essensplan>(
       context: context,
       builder: (context) => AddEssensplanDialog(plan: alterPlan),
@@ -71,29 +78,39 @@ class _EssensplanDialogState extends State<EssensplanDialog> {
       viewModel.updateEssensplan(originalIndex, geaenderterPlan);
       // HINWEIS: Die setState-Zeile hier war überflüssig und wurde entfernt,
       // da _filterPlaene() bereits setState aufruft.
-      _filterPlaene(); // Filter neu anwenden
+      // _filterPlaene(); // Filter neu anwenden
     }
   }
 
  void _einenPlanLoeschen(Essensplan plan) {
-
-    setState(() {
-      viewModel.deleteEssensplan(plan);
-      _filterPlaene(); 
-    });
+  Provider.of<EssensplanViewModel>(context, listen: false)
+  .deleteEssensplan(plan);
+   // setState(() {
+   //   viewModel.deleteEssensplan(plan);
+   //   _filterPlaene(); 
+   // });
   }
 
   @override
   Widget build(BuildContext context) {
-    final loginVM = Provider.of<LoginViewModel>(context, listen: false);
+    final essensplanVM = context.watch<EssensplanViewModel>();
+    // final loginVM = Provider.of<LoginViewModel>(context, listen: false);
+    final loginVM = context.read<LoginViewModel>(); // "read" für einmaligen Zugriff
     final isAdmin = loginVM.loggedInUser?.role == UserRole.admin;
+    final l10n = AppLocalizations.of(context)!;
+
+    // Die Filterlogik wird jetzt direkt hier im Build angewendet.
+    final query = _filterController.text;
+    final gefiltertePlaene = essensplanVM.wochenplaene.where((plan) {
+      return plan.wochennummer.toString().contains(query);
+    }).toList();
     
     // Eine Liste mit den Wochentagen für die Anzeige
-    const wochentage = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'];
+    const wochentageKeys = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Wochenpläne'),
+        title:  Text(l10n.essensplanTitle),
       ),
       body: Column(
         children: [
@@ -101,22 +118,23 @@ class _EssensplanDialogState extends State<EssensplanDialog> {
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               controller: _filterController,
-              decoration: const InputDecoration(
-                labelText: 'Nach Woche filtern...',
-                suffixIcon: Icon(Icons.search),
+              decoration: InputDecoration(
+                labelText: l10n.filterByWeek,
+                suffixIcon: const Icon(Icons.search),
               ),
             ),
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: _gefiltertePlaene.length,
+              itemCount: gefiltertePlaene.length, // _ weggenommen
               itemBuilder: (context, index) {
-                final plan = _gefiltertePlaene[index];
+                final plan = gefiltertePlaene[index]; // _ weggenommen
 
                 // Der Inhalt der Kachel, der für beide (Admin/User) gleich ist
                 final tileContent = ExpansionTile(
                   title: Text(
-                    'Woche ${plan.wochennummer}',
+                    '${l10n.week} ${plan.wochennummer}',
+                    // 'Woche ${plan.wochennummer}',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   // KORRIGIERT: Wir bauen die Liste jetzt mit Index, um den Wochentag zuzuordnen
@@ -124,16 +142,23 @@ class _EssensplanDialogState extends State<EssensplanDialog> {
                     ...List.generate(plan.essenProWoche.length, (essenIndex) {
                       final essen = plan.essenProWoche[essenIndex];
                       // Wir stellen sicher, dass wir nicht mehr Wochentage als vorhanden zugreifen
-                      final wochentag = essenIndex < wochentage.length ? wochentage[essenIndex] : '';
+                      //final wochentag = essenIndex < wochentage.length ? wochentage[essenIndex] : '';
+                      final wochentagKey = wochentageKeys[essenIndex];
+
+                      final translatedName = getTranslatedMealName(essen.mealKey, l10n);
+                      final translatedArt = getTranslatedArtName(essen.art, l10n);
+                      final translatedWeekday = l10n.translate(wochentagKey); 
 
                       return ListTile(
-                        title: Text('${wochentag}: ${essen.name}'),
+                        title: Text('$translatedWeekday: $translatedName'),
+                        //Text('${wochentag}: ${essen.name}'),
                         subtitle: Text(
-                          '${essen.art.anzeigeName} – ${essen.preis.toStringAsFixed(2)} €',
+                          '$translatedArt – ${essen.preis.toStringAsFixed(2)} €',
+                          // '${essen.art.localizedName} – ${essen.preis.toStringAsFixed(2)} €',
                         ),
                         trailing: IconButton(
                           icon: const Icon(Icons.rate_review_outlined),
-                          tooltip: 'Bewertung abgeben',
+                          tooltip: l10n.addReviewTooltip,
                           onPressed: () {
                             // Annahme: AddBewertungDialog benötigt ein `essen`-Objekt
                             showDialog(
@@ -151,7 +176,7 @@ class _EssensplanDialogState extends State<EssensplanDialog> {
                         child: TextButton.icon(
                           onPressed: () => _einenPlanBearbeiten(plan),
                           icon: const Icon(Icons.edit),
-                          label: const Text('Plan bearbeiten'),
+                          label: Text(l10n.editPlanButton),
                         ),
                       ),
                   ],
@@ -160,7 +185,8 @@ class _EssensplanDialogState extends State<EssensplanDialog> {
                 if (isAdmin) {
                   // Admins bekommen die Wisch-zum-Löschen-Funktion
                   return Dismissible(
-                    key: Key(plan.wochennummer.toString() + plan.essenProWoche.toString()),
+                    key: ValueKey(plan.wochennummer),
+                    // key: Key(plan.wochennummer.toString() + plan.essenProWoche.toString()),
                     direction: DismissDirection.endToStart,
                     background: Container(
                       color: Colors.red,
@@ -168,19 +194,20 @@ class _EssensplanDialogState extends State<EssensplanDialog> {
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: const Icon(Icons.delete, color: Colors.white),
                     ),
-                    onDismissed: (direction) {
-                      _einenPlanLoeschen(plan);
-                    },
+                    onDismissed: (direction) => _einenPlanLoeschen(plan),
+                   // onDismissed: (direction) {
+                   //   _einenPlanLoeschen(plan);
+                   // },
                     confirmDismiss: (direction) async {
                       return await showDialog<bool>(
                         context: context,
                         builder: (BuildContext context) {
                           return AlertDialog(
-                            title: const Text('Bestätigung'),
-                            content: Text('Möchten Sie den Plan für Woche ${plan.wochennummer} wirklich löschen?'),
+                            title:  Text(l10n.confirmDeleteTitle),
+                            content: Text(l10n.confirmDeletePlanContent(plan.wochennummer.toString())),
                             actions: <Widget>[
-                              TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Abbrechen')),
-                              TextButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Löschen')),
+                              TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text(l10n.cancelButton)),
+                              TextButton(onPressed: () => Navigator.of(context).pop(true), child: Text(l10n.deleteButton)),
                             ],
                           );
                         },
@@ -206,10 +233,23 @@ class _EssensplanDialogState extends State<EssensplanDialog> {
       floatingActionButton: isAdmin
           ? FloatingActionButton(
               onPressed: _einenNeuenPlanHinzufuegen,
-              tooltip: 'Wochenplan hinzufügen',
+              tooltip: l10n.addPlanTooltip,
               child: const Icon(Icons.add),
             )
           : null,
     );
+  }
+}
+// Kleine Helfer-Extension auf AppLocalizations, um Wochentage dynamisch zu übersetzen.
+extension LocalizationHelper on AppLocalizations {
+  String translate(String key) {
+    switch (key) {
+      case 'monday': return monday;
+      case 'tuesday': return tuesday;
+      case 'wednesday': return wednesday;
+      case 'thursday': return thursday;
+      case 'friday': return friday;
+      default: return '';
+    }
   }
 }

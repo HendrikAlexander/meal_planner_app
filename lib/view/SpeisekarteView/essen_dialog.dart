@@ -1,87 +1,77 @@
-// lib/view/SpeisekarteView/essen_dialog.dart
-
 import 'package:flutter/material.dart';
+import 'package:meal_planner_app/l10n/app_localizations.dart';
 import 'package:meal_planner_app/model/user.dart';
-import 'package:meal_planner_app/viewmodel/LoginViewModel/login_viewmodel.dart';
 import 'package:provider/provider.dart';
 import '../../model/essen.dart';
-import '../../model/essens_art.dart';
+import '../../model/essens_datenbank.dart';
 import '../../viewmodel/SpeisekarteViewModel/essen_viewmodel.dart';
 import 'add_essen_dialog.dart';
 
-class EssenDialog extends StatefulWidget {
+// WICHTIG: Imports für die Übersetzungen und das LoginViewModel
+
+import '../../viewmodel/LoginViewModel/login_viewmodel.dart';
+
+class EssenDialog extends StatelessWidget {
   const EssenDialog({super.key});
 
   @override
-  State<EssenDialog> createState() => _EssenDialogState();
-}
-
-class _EssenDialogState extends State<EssenDialog> {
-  final EssenViewModel viewModel = EssenViewModel();
-
-  void _einNeuesEssenHinzufuegen() async {
-    final neuesEssen = await showDialog<Essen>(
-      context: context,
-      builder: (BuildContext context) {
-        return const AddEssenDialog();
-      },
-    );
-    if (neuesEssen != null) {
-      setState(() {
-        viewModel.addEssen(neuesEssen);
-      });
-    }
-  }
-
-  // MODIFIED: This function now handles the "DELETE" signal
-  void _einEssenBearbeiten(Essen altesEssen, int index) async {
-    // Das Ergebnis des Dialogs abwarten. Es kann jetzt ein Essen, ein String oder null sein.
-    final result = await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // Dialog im "Bearbeiten"-Modus → aktuelles Essen übergeben
-        return AddEssenDialog(essen: altesEssen);
-      },
-    );
-
-    // Nichts tun, wenn der Benutzer auf "Abbrechen" geklickt hat (result ist dann null)
-    if (result == null) return;
-
-    // Prüfen, welches Ergebnis zurückkam (Löschen oder Bearbeiten)
-    if (result == 'DELETE_ACTION') {
-      // Wenn das Löschen-Signal kommt, die bereits existierende Löschen-Funktion aufrufen
-      _einEssenLoeschen(altesEssen);
-    } else if (result is Essen) {
-      // Wenn ein geändertes Essen zurückkommt, die UI mit dem neuen Objekt aktualisieren
-      setState(() {
-        // Geändertes Essen im ViewModel aktualisieren
-        viewModel.updateEssen(index, result);
-      });
-    }
-  }
-
-  void _einEssenLoeschen(Essen essen) {
-    setState(() {
-      viewModel.deleteEssen(essen);
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final isAdmin =
-        Provider.of<LoginViewModel>(context, listen: false).currentRole ==
-        UserRole.admin;
+    // --- TEIL 1: DATEN HOLEN ---
+    // Alle benötigten Daten werden am Anfang der build-Methode geholt.
+    final essenVM = context.watch<EssenViewModel>();
+    final loginVM = context.read<LoginViewModel>();
+    final isAdmin = loginVM.loggedInUser?.role == UserRole.admin;
+    final l10n = AppLocalizations.of(context)!;
 
+    // --- TEIL 2: METHODEN DEFINIEREN (INNERHALB von build) ---
+    // Die Methoden werden hier deklariert, damit sie auf die Variablen
+    // aus Teil 1 (z.B. essenVM, context) zugreifen können.
+    void _einNeuesEssenHinzufuegen() async {
+      final neuesEssen = await showDialog<Essen>(
+        context: context,
+        builder: (BuildContext context) => const AddEssenDialog(),
+      );
+      if (neuesEssen != null) {
+        essenVM.addEssen(neuesEssen);
+      }
+    }
+
+    void _einEssenBearbeiten(Essen altesEssen, int index) async {
+      final result = await showDialog(
+        context: context,
+        builder: (BuildContext context) => AddEssenDialog(essen: altesEssen),
+      );
+      if (result == null) return;
+      if (result == 'DELETE_ACTION') {
+        essenVM.deleteEssen(altesEssen);
+      } else if (result is Essen) {
+        essenVM.updateEssen(index, result);
+      }
+    }
+
+    // --- TEIL 3: UI ZURÜCKGEBEN ---
+    // Das ist der sichtbare Teil, der die Methoden aus Teil 2 verwendet.
     return Scaffold(
-      appBar: AppBar(title: const Text('Speisekarte')),
+      appBar: AppBar(
+        title: Text(l10n.speisekarteTitle),
+      ),
       body: ListView.builder(
-        itemCount: viewModel.essenListe.length,
+        itemCount: essenVM.essenListe.length,
         itemBuilder: (context, index) {
-          final essen = viewModel.essenListe[index];
+          final essen = essenVM.essenListe[index];
+          final translatedName = getTranslatedMealName(essen.mealKey, l10n);
+          final translatedArt = getTranslatedArtName(essen.art, l10n);
+
+          final tile = ListTile(
+            title: Text(translatedName),
+            subtitle: Text(translatedArt),
+            trailing: Text('${essen.preis.toStringAsFixed(2)} €'),
+            onTap: isAdmin ? () => _einEssenBearbeiten(essen, index) : null,
+          );
+
           if (isAdmin) {
-            // Admins dürfen löschen
             return Dismissible(
-              key: Key(essen.name + index.toString()),
+              key: ValueKey(essen.mealKey),
               direction: DismissDirection.endToStart,
               background: Container(
                 color: Colors.red,
@@ -90,57 +80,46 @@ class _EssenDialogState extends State<EssenDialog> {
                 child: const Icon(Icons.delete, color: Colors.white),
               ),
               onDismissed: (direction) {
-                _einEssenLoeschen(essen);
+                essenVM.deleteEssen(essen);
               },
               confirmDismiss: (direction) async {
                 return await showDialog<bool>(
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
-                      title: const Text('Bestätigung'),
+                      title: Text(l10n.confirmDeleteTitle),
                       content: Text(
-                        'Möchten Sie "${essen.name}" wirklich löschen?',
+                        l10n.confirmDeleteMealContent(translatedName),
                       ),
                       actions: <Widget>[
                         TextButton(
                           onPressed: () => Navigator.of(context).pop(false),
-                          child: const Text('Abbrechen'),
+                          child: Text(l10n.cancelButton),
                         ),
                         TextButton(
                           onPressed: () => Navigator.of(context).pop(true),
-                          child: const Text('Löschen'),
+                          child: Text(l10n.deleteButton),
                         ),
                       ],
                     );
                   },
                 );
               },
-              child: ListTile(
-                title: Text(essen.name),
-                subtitle: Text(essen.art.anzeigeName),
-                trailing: Text('${essen.preis.toStringAsFixed(2)} €'),
-                
-                onTap: () {
-                  _einEssenBearbeiten(essen, index);
-                },
-              ),
+              child: tile,
             );
           } else {
-            // Nur lesender Zugriff für Nicht-Admins
-            return ListTile(
-              title: Text(essen.name),
-              subtitle: Text(essen.art.anzeigeName),
-              trailing: Text('${essen.preis.toStringAsFixed(2)} €'),
-              
-            );
+            return tile;
           }
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _einNeuesEssenHinzufuegen,
-        tooltip: 'Essen hinzufügen',
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: isAdmin
+          ? FloatingActionButton(
+              onPressed: _einNeuesEssenHinzufuegen,
+              tooltip: l10n.addMealTooltip,
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 }
+

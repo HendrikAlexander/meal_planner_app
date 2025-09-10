@@ -2,6 +2,8 @@
 
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:meal_planner_app/l10n/app_localizations.dart';
+import 'package:meal_planner_app/model/essens_datenbank.dart';
 import 'package:meal_planner_app/model/user.dart';
 import 'package:meal_planner_app/viewmodel/LoginViewModel/login_viewmodel.dart';
 import 'package:provider/provider.dart';
@@ -15,32 +17,36 @@ class BewertungDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final bewertungenViewModel = Provider.of<EssensbewertungViewModel>(context);
     final bewertungen = bewertungenViewModel.bewertungen;
     final isAdmin = Provider.of<LoginViewModel>(context, listen: false).currentRole == UserRole.admin;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Alle Bewertungen'),
+        title: Text(l10n.allReviewsTitle),
       ),
       body: bewertungen.isEmpty
-          ? const Center(child: Text('Keine Bewertungen vorhanden.'))
+          ? Center(child: Text(l10n.noReviewsAvailable))
           : ListView.builder(
               itemCount: bewertungen.length,
               itemBuilder: (context, index) {
                 final bewertung = bewertungen[index];
+                 final translatedMealName = getTranslatedMealName(bewertung.essenMealKey, l10n);
 
                 return Card(
                   margin: const EdgeInsets.all(8.0),
                   child: ListTile(
-                    title: Text('Bewertung: ${bewertung.essensbewertung} Sterne'),
+                    title: Text('"$translatedMealName"'),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Essen-Name anzeigen
-                        Text('Essen: ${bewertung.essenName}'),
-                        Text('Erstellt von: ${bewertung.erstelltVon}'),
-                        Text('Kommentar: ${bewertung.essensbewertungstext}'),
+                        Text(l10n.starsRating(bewertung.essensbewertung.toString())),
+                        const SizedBox(height: 4),
+                        Text('"${bewertung.essensbewertungstext}"'),
+                        const SizedBox(height: 4),
+                        Text(l10n.reviewBy(bewertung.erstelltVon)),
                         const SizedBox(height: 8),
                         // Zeige Bild, falls vorhanden
                         if (bewertung.essensfoto.isNotEmpty)
@@ -77,19 +83,19 @@ class BewertungDialog extends StatelessWidget {
                                   showDialog(
                                     context: context,
                                     builder: (context) => AlertDialog(
-                                      title: const Text('Bewertung löschen'),
-                                      content: const Text('Möchten Sie diese Bewertung wirklich löschen?'),
+                                      title: Text(l10n.deleteReviewTitle),
+                                      content: Text(l10n.deleteReviewContent),
                                       actions: [
                                         TextButton(
                                           onPressed: () => Navigator.pop(context),
-                                          child: const Text('Abbrechen'),
+                                          child: Text(l10n.cancelButton),
                                         ),
                                         ElevatedButton(
                                           onPressed: () {
                                             bewertungenViewModel.bewertungEntfernen(index);
                                             Navigator.pop(context);
                                           },
-                                          child: const Text('Löschen'),
+                                          child: Text(l10n.deleteButton),
                                         ),
                                       ],
                                     ),

@@ -1,0 +1,151 @@
+{
+    "@@locale": "de",
+    "appTitle": "Essensplaner App",
+    "login": "Login",
+    "username": "Benutzername",
+    "password": "Passwort",
+    "selectRole": "Rolle auswählen",
+    "adminRole": "Admin",
+    "userRole": "Benutzer",
+    "loginButton": "Einloggen",
+    "continueAsGuest": "Als Gast fortfahren",
+    "changeLanguage": "Sprache ändern",
+    "spaghettiCarbonara": "Spaghetti Carbonara",
+    "linsenCurry": "Linsen-Curry",
+    "kaesespaetzle": "Käsespätzle",
+    "haehnchenSuessSauer": "Hähnchen süß-sauer",
+    "gemueseLasagne": "Gemüse-Lasagne",
+    "falafelTeller": "Falafel-Teller",
+    "wienerSchnitzel": "Wiener Schnitzel",
+    "pizzaMargherita": "Pizza Margherita",
+    "tofuPfanne": "Tofu-Pfanne",
+    "rindergulasch": "Rindergulasch",
+    "vegetarian": "Vegetarisch",
+    "vegan": "Vegan",
+    "withMeat": "Mit Fleisch",
+    "allReviewsTitle": "Alle Bewertungen",
+    "noReviewsAvailable": "Keine Bewertungen vorhanden.",
+    "reviewRating": "Bewertung: {rating} Sterne",
+    "@reviewRating": {
+        "placeholders": {
+            "rating": {}
+        }
+    },
+    "foodName": "Essen: {name}",
+    "@foodName": {
+        "placeholders": {
+            "name": {}
+        }
+    },
+    "createdBy": "Erstellt von: {user}",
+    "@createdBy": {
+        "placeholders": {
+            "user": {}
+        }
+    },
+    "commentText": "Kommentar: {comment}",
+    "@commentText": {
+        "placeholders": {
+            "comment": {}
+        }
+    },
+    "editButton": "Bearbeiten",
+    "deleteButton": "Löschen",
+    "deleteReviewTitle": "Bewertung löschen",
+    "deleteReviewContent": "Möchten Sie diese Bewertung wirklich löschen?",
+    "cancelButton": "Abbrechen",
+    "confirmDeleteButton": "Löschen",
+    "monday": "Montag",
+    "tuesday": "Dienstag",
+    "wednesday": "Mittwoch",
+    "thursday": "Donnerstag",
+    "friday": "Freitag",
+    "essensplanTitle": "Wochenpläne",
+    "filterByWeek": "Nach Woche filtern...",
+    "week": "Woche",
+    "addReviewTooltip": "Bewertung abgeben",
+    "addPlanTooltip": "Wochenplan hinzufügen",
+    "editPlanButton": "Plan bearbeiten",
+    "confirmDeleteTitle": "Bestätigung",
+    "confirmDeletePlanContent": "Möchten Sie den Plan für Woche {weekNumber} wirklich löschen?",
+    "@confirmDeletePlanContent": {
+        "placeholders": {
+            "weekNumber": {}
+        }
+    },
+    "speisekarteTitle": "Speisekarte",
+    "addMealTooltip": "Neues Essen hinzufügen",
+    "confirmDeleteMealContent": "Möchten Sie \"{mealName}\" wirklich löschen?",
+    "@confirmDeleteMealContent": {
+        "placeholders": {
+            "mealName": {}
+        }
+    },
+    "addMealTitle": "Neues Essen anlegen",
+    "editMealTitle": "Essen bearbeiten",
+    "mealNameLabel": "Name des Gerichts",
+    "priceLabel": "Preis",
+    "saveButton": "Speichern",
+    "addPlanTitle": "Neuen Wochenplan erstellen",
+    "editPlanTitle": "Wochenplan bearbeiten",
+    "weekNumberLabel": "Wochennummer",
+    "selectedMealsLabel": "Ausgewählte Gerichte ({count}/5) - Reihenfolge anpassen:",
+    "@selectedMealsLabel": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "availableMealsLabel": "Verfügbare Gerichte zum Hinzufügen:",
+    "editMealTooltip": "Gericht bearbeiten",
+    "removeMealFromPlanTooltip": "Gericht aus Plan entfernen",
+    "addMealToPlanTooltip": "Gericht zum Plan hinzufügen",
+    "addReviewTitle": "Bewertung abgeben",
+    "editReviewTitle": "Bewertung bearbeiten",
+    "loggedInAs": "Eingeloggt als: {username}",
+    "@loggedInAs": {
+        "placeholders": {
+            "username": {}
+        }
+    },
+    "starsRating": "{count} Sterne",
+    "@starsRating": {
+        "placeholders": {
+            "count": {}
+        }
+    },
+    "yourReviewLabel": "Deine Bewertung",
+    "takeAPhoto": "Foto aufnehmen",
+    "photoOnlyOnMobile": "Fotoaufnahme ist nur auf mobilen Geräten verfügbar.",
+    "cameraNotAvailable": "Kamera im Simulator nicht verfügbar. Bitte auf einem echten Gerät testen.",
+    "reviewTextRequired": "Bitte geben Sie einen Bewertungstext ein.",
+    "reviewBy": "Bewertung von: {username}",
+    "@reviewBy": {
+        "placeholders": {
+            "username": {}
+        }
+    },
+    "manageMenuTitle": "Speisekarte verwalten",
+    "manageMenuSubtitle": "Alle verfügbaren Essen anlegen, bearbeiten und löschen",
+    "weeklyPlansTitle": "Wochenpläne",
+    "weeklyPlansSubtitle": "Essenspläne für die nächsten Wochen anzeigen",
+    "reviewsTitle": "Bewertungen",
+    "reviewsSubtitle": "Alle abgegebenen Bewertungen einsehen",
+    "loginSubtitle": "Anmelden, als Admin oder Nutzer",
+    "loggedInAsInfo": "Angemeldet als: {username} ({role})",
+    "@loggedInAsInfo": {
+        "placeholders": {
+            "username": {},
+            "role": {}
+        }
+    },
+    "addPlanTitle": "Neuen Wochenplan erstellen",
+    "editPlanTitle": "Wochenplan bearbeiten",
+    "weekNumberLabel": "Wochennummer",
+    "selectedMealsLabel": "Ausgewählte Gerichte ({count}/5) - Reihenfolge anpassen:",
+    "@selectedMealsLabel": {
+        "placeholders": {
+            "count": {}
+        }
+    }
+}
+

@@ -2,13 +2,22 @@ import '../../model/user.dart';
 import 'package:flutter/material.dart';
 
 class LoginViewModel extends ChangeNotifier {
+  Locale _currentLocale = const Locale('de');
+  Locale get currentLocale => _currentLocale;
+  void setLocale(Locale locale) {
+    if (_currentLocale == locale) return;
+    _currentLocale = locale;
+    notifyListeners();
+  }
   String username = '';
   String password = '';
-  UserRole? selectedRole;
-
-  AppUser? loggedInUser;
-
-  get currentRole => selectedRole;
+  UserRole selectedRole = UserRole.user;
+//  UserRole? selectedRole;
+  AppUser? loggedInUser; 
+ 
+  
+  // get currentRole => selectedRole;
+  UserRole? get currentRole => loggedInUser?.role;
 
   void login() {
     if (username.isNotEmpty && selectedRole != null) {
@@ -35,7 +44,9 @@ class LoginViewModel extends ChangeNotifier {
   }
 
   void setRole(UserRole? role) {
-    selectedRole = role;
-    notifyListeners();
+    if (role != null) {
+      selectedRole = role;
+      notifyListeners();
+    }
   }
 }
