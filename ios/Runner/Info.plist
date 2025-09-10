@@ -45,5 +45,10 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Diese App benötigt Zugriff auf die Kamera, um Fotos von Gerichten für Bewertungen aufnehmen zu können.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Diese App benötigt Zugriff auf die Fotobibliothek, falls du ein bereits aufgenommenes Foto für eine Bewertung verwenden möchtest.</string>
+
 </dict>
 </plist>

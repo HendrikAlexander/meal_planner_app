@@ -2,6 +2,7 @@ import 'dart:io'; // Für File und Plattformabfrage (Android/iOS)
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb; // Plattformcheck (Web)
 import 'package:image_picker/image_picker.dart'; // Für Kamera
+import 'package:meal_planner_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../../model/essensbewertung.dart';
@@ -30,12 +31,13 @@ class _AddBewertungDialogState extends State<AddBewertungDialog> {
 
   // Nur echte Mobile-Plattformen: Android/iOS (kein Web, kein Desktop)
   bool get _isMobile => !kIsWeb && (Platform.isAndroid || Platform.isIOS);
+  bool get isEditing => widget.vorhandeneBewertung != null;
 
   @override
   void initState() {
     super.initState();
     // Wenn eine vorhandene Bewertung übergeben wurde → Felder vorausfüllen
-    if (widget.vorhandeneBewertung != null) {
+    if (isEditing) { //widget.vorhandeneBewertung != null
       _selectedRating = widget.vorhandeneBewertung!.essensbewertung;
       _textController.text = widget.vorhandeneBewertung!.essensbewertungstext;
       if (widget.vorhandeneBewertung!.essensfoto.isNotEmpty && _isMobile) {
@@ -46,12 +48,12 @@ class _AddBewertungDialogState extends State<AddBewertungDialog> {
   }
 
   // Öffnet die Kamera und speichert das aufgenommene Bild (nur Mobile)
-  Future<void> _bildAufnehmen() async {
+  Future<void> _bildAufnehmen(AppLocalizations l10n) async {
     if (!_isMobile) {
       // Sicherheitsnetz: auf Web/Desktop gar nicht aktiv
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Fotoaufnahme ist nur auf mobilen Geräten verfügbar.')),
+         SnackBar(content: Text(l10n.photoOnlyOnMobile)),
         );
       }
       return;
@@ -66,7 +68,7 @@ class _AddBewertungDialogState extends State<AddBewertungDialog> {
       // Simulator hat meist keine Kamera → Hinweis
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Kamera im Simulator nicht verfügbar. Bitte auf einem echten Gerät testen.')),
+           SnackBar(content: Text(l10n.cameraNotAvailable)),
         );
       }
     }
@@ -77,12 +79,11 @@ class _AddBewertungDialogState extends State<AddBewertungDialog> {
     // Eingeloggter Nutzer 
     final loginVM = context.watch<LoginViewModel>();
     final loggedInUser = loginVM.loggedInUser!; // bewusst non-null
+    final l10n = AppLocalizations.of(context)!;
 
     return AlertDialog(
       // Titel je nach Modus: Neu oder Bearbeiten
-      title: Text(widget.vorhandeneBewertung == null
-          ? 'Bewertung abgeben'
-          : 'Bewertung bearbeiten'),
+      title: Text(isEditing ? l10n.editReviewTitle : l10n.addReviewTitle), // widget.vorhandeneBewertung == null,  ? 'Bewertung abgeben' : 'Bewertung bearbeiten'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -90,7 +91,7 @@ class _AddBewertungDialogState extends State<AddBewertungDialog> {
           Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'Eingeloggt als: ${loggedInUser.username}',
+              l10n.loggedInAs(loggedInUser.username), // 'Eingeloggt als: ${loggedInUser.username}',
               style: const TextStyle(fontStyle: FontStyle.italic),
             ),
           ),
@@ -102,7 +103,7 @@ class _AddBewertungDialogState extends State<AddBewertungDialog> {
             items: [1, 2, 3, 4, 5].map((wert) {
               return DropdownMenuItem(
                 value: wert,
-                child: Text('$wert Sterne'),
+                child: Text(l10n.starsRating(wert.toString())), // '$wert Sterne'
               );
             }).toList(),
             onChanged: (value) {
@@ -117,9 +118,9 @@ class _AddBewertungDialogState extends State<AddBewertungDialog> {
           TextField(
             controller: _textController,
             maxLines: 3,
-            decoration: const InputDecoration(
-              labelText: 'Deine Bewertung',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: l10n.yourReviewLabel,
+              border: const OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 16),
@@ -127,9 +128,9 @@ class _AddBewertungDialogState extends State<AddBewertungDialog> {
           // Kamera-Button und Bild-Vorschau — NUR Mobile (Android/iOS)
           if (_isMobile) ...[
             ElevatedButton.icon(
-              onPressed: _bildAufnehmen,
+              onPressed: () => _bildAufnehmen(l10n), // _bildAufnehmen,
               icon: const Icon(Icons.camera_alt),
-              label: const Text("Foto aufnehmen"),
+              label: Text(l10n.takeAPhoto),
             ),
             if (_imageFile != null)
               Padding(
@@ -138,9 +139,9 @@ class _AddBewertungDialogState extends State<AddBewertungDialog> {
               ),
           ] else ...[
             // Hinweis für Web/Desktop (kein Upload, kein FilePicker)
-            const Text(
-              'Fotoaufnahme ist nur auf mobilen Geräten (Android/iOS) verfügbar.',
-              style: TextStyle(fontStyle: FontStyle.italic),
+             Text(
+              l10n.photoOnlyOnMobile,
+              style: const TextStyle(fontStyle: FontStyle.italic),
             ),
           ],
         ],
@@ -149,7 +150,7 @@ class _AddBewertungDialogState extends State<AddBewertungDialog> {
         // Button zum Schließen ohne Speichern
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Abbrechen'),
+          child: Text(l10n.cancelButton),
         ),
 
         // Button zum Speichern der Bewertung
@@ -158,24 +159,26 @@ class _AddBewertungDialogState extends State<AddBewertungDialog> {
             // Pflicht-Validierung: Bewertungstext darf nicht leer sein
             if (_textController.text.trim().isEmpty) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Bitte geben Sie einen Bewertungstext ein.'),
+                SnackBar(
+                  content: Text(l10n.reviewTextRequired),
                   backgroundColor: Colors.red,
                 ),
               );
               return;
             }
+             final mealKey = widget.essen?.mealKey ?? widget.vorhandeneBewertung!.essenMealKey;
 
             // Neue Bewertung erstellen (Autorname kommt aus dem Login)
             final neueBewertung = Essensbewertung(
-              essenName: widget.essen?.name ?? widget.vorhandeneBewertung!.essenName, // Essen-Name
+              essenMealKey: mealKey,
+             // essenName: widget.essen?.name ?? widget.vorhandeneBewertung!.essenName, // Essen-Name
               essensfoto: _isMobile ? (_imageFile?.path ?? '') : '', // Nur Mobile speichert Pfad
               essensbewertung: _selectedRating,
               essensbewertungstext: _textController.text,
               erstelltVon: loggedInUser.username, // 👤 automatisch aus Login
             );
 
-            if (widget.vorhandeneBewertung == null) {
+            if (!isEditing) { // widget.vorhandeneBewertung == null
               // Neue Bewertung → direkt in ViewModel speichern
               Provider.of<EssensbewertungViewModel>(context, listen: false)
                   .bewertungHinzufuegen(neueBewertung);
@@ -185,7 +188,7 @@ class _AddBewertungDialogState extends State<AddBewertungDialog> {
               Navigator.pop(context, neueBewertung);
             }
           },
-          child: const Text('Speichern'),
+          child: Text(l10n.saveButton),
         ),
       ],
     );

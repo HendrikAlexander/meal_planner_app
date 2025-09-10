@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:meal_planner_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../../model/user.dart';
 import '../../viewmodel/LoginViewModel/login_viewmodel.dart';
@@ -8,10 +11,11 @@ class LoginView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final vm = Provider.of<LoginViewModel>(context);
+    final vm = Provider.of<LoginViewModel>(context, listen: false);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Login"),automaticallyImplyLeading: false),
+      appBar: AppBar(title: Text(l10n.login),automaticallyImplyLeading: false),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -20,24 +24,24 @@ class LoginView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch, // Lässt Buttons die volle Breite einnehmen
             children: [
               TextField(
-                decoration: const InputDecoration(labelText: "Benutzername"),
+                decoration: InputDecoration(labelText: l10n.username),
                 onChanged: vm.setUsername,
               ),
               const SizedBox(height: 10),
               TextField(
-                decoration: const InputDecoration(labelText: "Passwort"),
+                decoration: InputDecoration(labelText: l10n.password),
                 obscureText: true,
                 onChanged: vm.setPassword,
               ),
               const SizedBox(height: 10),
               DropdownButton<UserRole>(
-                value: vm.selectedRole,
+                value: context.watch<LoginViewModel>().selectedRole,
                 isExpanded: true, // Nimmt die volle Breite ein
-                hint: const Text("Rolle auswählen"),
+                hint:  Text(l10n.selectRole),
                 items: UserRole.values.map((role) {
                   return DropdownMenuItem(
                     value: role,
-                    child: Text(role == UserRole.admin ? "Admin" : "User"),
+                    child: Text(role == UserRole.admin ? l10n.adminRole : l10n.userRole),
                   );
                 }).toList(),
                 onChanged: vm.setRole,
@@ -50,9 +54,9 @@ class LoginView extends StatelessWidget {
                     Navigator.pushReplacementNamed(context, '/');
                   }
                 },
-                child: const Text("Einloggen"),
+                child: Text(l10n.loginButton),
               ),
-              const SizedBox(height: 10),
+               SizedBox(height: 10),
               // NEUER BUTTON: Für den Gast-Login
               TextButton(
                 onPressed: () {
@@ -61,7 +65,28 @@ class LoginView extends StatelessWidget {
                   // Navigiert direkt zur Startseite
                   Navigator.pushReplacementNamed(context, '/');
                 },
-                child: const Text("Als Gast fortfahren"),
+                child: Text(l10n.continueAsGuest),
+              ),
+               // HIER kommt der Sprachwechsel-Knopf/die Knöpfe
+              Text("${AppLocalizations.of(context)!.changeLanguage}:"),
+              const SizedBox(height: 10),
+              Row(
+  mainAxisAlignment: MainAxisAlignment.center,
+  children: [
+    TextButton(
+      onPressed: () {
+        vm.setLocale(const Locale('de'));
+      },
+      child: const Text('Deutsch 🇩🇪'),
+    ),
+    const SizedBox(width: 20),
+    TextButton(
+      onPressed: () {
+        vm.setLocale(const Locale('en'));
+      },
+      child: const Text('English 🇬🇧'),
+   ),
+                ],
               ),
             ],
           ),
