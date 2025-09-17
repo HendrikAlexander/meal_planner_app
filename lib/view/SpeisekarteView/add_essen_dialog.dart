@@ -13,6 +13,7 @@ class AddEssenDialog extends StatefulWidget {
 }
 
 class _AddEssenDialogState extends State<AddEssenDialog> {
+  final _formKey = GlobalKey<FormState>();
   // Wir verwenden Controller für die Textfelder
   final _nameController = TextEditingController();
   final _preisController = TextEditingController();
@@ -27,17 +28,20 @@ class _AddEssenDialogState extends State<AddEssenDialog> {
 
     // Wenn wir ein Essen bearbeiten, füllen wir die Felder mit den existierenden Daten.
     if (isEditing) { //widget.essen != null
-      // WICHTIG: Wir müssen den Kontext abwarten, um auf l10n zuzugreifen.
+    final essen = widget.essen!;
+    _nameController.text = essen.name ?? '';
+    _preisController.text = essen.preis.toString();
+    _ausgewaehlteArt = essen.art;
+
+          // WICHTIG: Wir müssen den Kontext abwarten, um auf l10n zuzugreifen.
       // `addPostFrameCallback` führt den Code aus, nachdem der erste Frame gezeichnet wurde.
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) { // Sicherheitscheck, ob das Widget noch im Baum ist
-          final l10n = AppLocalizations.of(context)!;
-          _nameController.text = getTranslatedMealName(widget.essen!.mealKey, l10n);
+    //  WidgetsBinding.instance.addPostFrameCallback((_) {
+       // if (mounted) { // Sicherheitscheck, ob das Widget noch im Baum ist
+        //  final l10n = AppLocalizations.of(context)!;
+        // _nameController.text = getTranslatedMealName(widget.essen!.mealKey, l10n);
           // _nameController.text = widget.essen!.name;
-        }
-      });
-      _preisController.text = widget.essen!.preis.toString();
-      _ausgewaehlteArt = widget.essen!.art;
+   //))
+     // _ausgewaehlteArt = widget.essen!.art;
     } else {
       // Wenn wir ein neues Essen erstellen, starten wir mit einem Standardwert.
       _ausgewaehlteArt = EssensArt.vegetarisch;
@@ -64,24 +68,26 @@ class _AddEssenDialogState extends State<AddEssenDialog> {
           children: [
             // Im Bearbeiten-Modus kann der Name (mealKey) nicht geändert werden.
             // Wir zeigen ihn nur an.
-            if (isEditing)
+           // if (isEditing)
               TextField(
                 controller: _nameController,
                 decoration: InputDecoration(labelText: l10n.mealNameLabel),
-                readOnly: true, // Macht das Feld schreibgeschützt
-              )
-            else
+                autofocus: !isEditing,
+                // readOnly: true, // Macht das Feld schreibgeschützt
+              ),
+           // else
               // Nur im "Neu anlegen"-Modus kann ein Name vergeben werden.
               TextField(
-                controller: _nameController,
-                decoration: InputDecoration(labelText: l10n.mealNameLabel),
-                autofocus: true,
+                controller: _preisController,
+                decoration: InputDecoration(labelText: l10n.priceLabel),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                 // autofocus: true,
               ),
-            TextField(
-              controller: _preisController,
-              decoration: InputDecoration(labelText: l10n.priceLabel),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            ),
+           // TextField(
+             // controller: _preisController,
+             // decoration: InputDecoration(labelText: l10n.priceLabel),
+             // keyboardType: const TextInputType.numberWithOptions(decimal: true),
+           // ),
             DropdownButton<EssensArt>(
               value: _ausgewaehlteArt,
               isExpanded: true,
@@ -132,6 +138,7 @@ class _AddEssenDialogState extends State<AddEssenDialog> {
             // } else {
             final neuesEssen = Essen(
               mealKey: mealKey, // name: _nameController.text,
+              name: _nameController.text.trim(),
               preis: double.tryParse(_preisController.text.replaceAll(',', '.')) ?? 0.0, // preis: double.tryParse(_preisController.text) ?? 0.0,
               art: _ausgewaehlteArt,
             );
@@ -145,4 +152,3 @@ class _AddEssenDialogState extends State<AddEssenDialog> {
     );
   }
 }
-

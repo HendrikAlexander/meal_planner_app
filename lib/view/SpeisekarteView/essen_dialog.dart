@@ -6,9 +6,6 @@ import '../../model/essen.dart';
 import '../../model/essens_datenbank.dart';
 import '../../viewmodel/SpeisekarteViewModel/essen_viewmodel.dart';
 import 'add_essen_dialog.dart';
-
-// WICHTIG: Imports für die Übersetzungen und das LoginViewModel
-
 import '../../viewmodel/LoginViewModel/login_viewmodel.dart';
 
 class EssenDialog extends StatelessWidget {
@@ -16,16 +13,11 @@ class EssenDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // --- TEIL 1: DATEN HOLEN ---
-    // Alle benötigten Daten werden am Anfang der build-Methode geholt.
     final essenVM = context.watch<EssenViewModel>();
     final loginVM = context.read<LoginViewModel>();
     final isAdmin = loginVM.loggedInUser?.role == UserRole.admin;
     final l10n = AppLocalizations.of(context)!;
 
-    // --- TEIL 2: METHODEN DEFINIEREN (INNERHALB von build) ---
-    // Die Methoden werden hier deklariert, damit sie auf die Variablen
-    // aus Teil 1 (z.B. essenVM, context) zugreifen können.
     void _einNeuesEssenHinzufuegen() async {
       final neuesEssen = await showDialog<Essen>(
         context: context,
@@ -49,8 +41,6 @@ class EssenDialog extends StatelessWidget {
       }
     }
 
-    // --- TEIL 3: UI ZURÜCKGEBEN ---
-    // Das ist der sichtbare Teil, der die Methoden aus Teil 2 verwendet.
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.speisekarteTitle),
@@ -59,7 +49,7 @@ class EssenDialog extends StatelessWidget {
         itemCount: essenVM.essenListe.length,
         itemBuilder: (context, index) {
           final essen = essenVM.essenListe[index];
-          final translatedName = getTranslatedMealName(essen.mealKey, l10n);
+          final translatedName = getTranslatedMealName(essen.mealKey, l10n, fallbackName: essen.name);
           final translatedArt = getTranslatedArtName(essen.art, l10n);
 
           final tile = ListTile(
@@ -71,7 +61,7 @@ class EssenDialog extends StatelessWidget {
 
           if (isAdmin) {
             return Dismissible(
-              key: ValueKey(essen.mealKey),
+              key: ObjectKey(essen),
               direction: DismissDirection.endToStart,
               background: Container(
                 color: Colors.red,
@@ -122,4 +112,3 @@ class EssenDialog extends StatelessWidget {
     );
   }
 }
-

@@ -222,6 +222,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editReviewTitle => 'Edit Review';
 
   @override
+  String get unknownMeal => 'Unknown Meal';
+
+  @override
   String loggedInAs(Object username) {
     return 'Logged in as: $username';
   }

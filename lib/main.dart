@@ -23,7 +23,7 @@ import 'view/LoginView/login_view.dart';
 import 'viewmodel/LoginViewModel/login_viewmodel.dart';
 
 void main() {
-  Essensdatenbank.instance.initializeMeals();
+  // Essensdatenbank.instance.initializeMeals();
   runApp(
     MultiProvider(
       providers: [

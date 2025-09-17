@@ -494,6 +494,12 @@ abstract class AppLocalizations {
   /// **'Edit Review'**
   String get editReviewTitle;
 
+  /// No description provided for @unknownMeal.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown Meal'**
+  String get unknownMeal;
+
   /// No description provided for @loggedInAs.
   ///
   /// In en, this message translates to:
