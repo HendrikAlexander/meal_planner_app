@@ -222,6 +222,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get editReviewTitle => 'Bewertung bearbeiten';
 
   @override
+  String get unknownMeal => 'Unbekanntes Gericht';
+
+  @override
   String loggedInAs(Object username) {
     return 'Eingeloggt als: $username';
   }

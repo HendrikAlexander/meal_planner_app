@@ -101,6 +101,7 @@
     "addMealToPlanTooltip": "Add meal to plan",
     "addReviewTitle": "Add Review",
     "editReviewTitle": "Edit Review",
+    "unknownMeal": "Unknown Meal",
     "loggedInAs": "Logged in as: {username}",
     "@loggedInAs": {
         "placeholders": {

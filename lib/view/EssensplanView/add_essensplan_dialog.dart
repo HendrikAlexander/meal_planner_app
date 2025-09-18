@@ -53,18 +53,23 @@ class _AddEssensplanDialogState extends State<AddEssensplanDialog> {
       if (result == 'DELETE_ACTION') {
         // FALL 1: Das Gericht soll gelöscht werden.
         // Wir entfernen es aus unserer lokalen Auswahlliste.
-        _ausgewaehlteEssen.remove(altesEssen);
+        _ausgewaehlteEssen.removeWhere((e) => e.mealKey == altesEssen.mealKey);
+        //_ausgewaehlteEssen.remove(altesEssen);
         // Und löschen es aus der zentralen Datenbank.
         _datenbank.deleteEssen(altesEssen);
       } else if (result is Essen) {
         // Da das Essen-Objekt "final" Eigenschaften hat, können wir es nicht direkt ändern.
         // Stattdessen müssen wir das alte Objekt in der Datenbank durch das neue ersetzen.
-        final originalIndexInDb = _datenbank.speisekarte.indexOf(altesEssen);
+        final originalIndexInDb = _datenbank.speisekarte.indexWhere(
+          (e) => e.mealKey == altesEssen.mealKey,
+           );// indexOf(altesEssen);
         if (originalIndexInDb != -1) {
           _datenbank.updateEssen(originalIndexInDb, result);
         }
-         final originalIndexInPlan = _ausgewaehlteEssen.indexOf(altesEssen);
-        if (originalIndexInPlan != -1) {
+         final originalIndexInPlan = _ausgewaehlteEssen.indexWhere(
+          (e) => e.mealKey == altesEssen.mealKey,// indexOf(altesEssen);
+          );
+          if (originalIndexInPlan != -1) {
           _ausgewaehlteEssen[originalIndexInPlan] = result;
           }
         }
