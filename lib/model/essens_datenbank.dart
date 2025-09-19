@@ -6,16 +6,16 @@ class Essensdatenbank {
   static final Essensdatenbank instance = Essensdatenbank._internal();
 
   final List<Essen> _speisekarte = [
-    Essen(mealKey: 'spaghettiCarbonara', preis: 9.50, art: EssensArt.mitFleisch),
-    Essen(mealKey: 'linsenCurry', preis: 8.00, art: EssensArt.vegan),
-    Essen(mealKey: 'kaesespaetzle', preis: 8.50, art: EssensArt.vegetarisch),
-    Essen(mealKey: 'haehnchenSuessSauer', preis: 10.20, art: EssensArt.mitFleisch),
-    Essen(mealKey: 'gemueseLasagne', preis: 9.00, art: EssensArt.vegetarisch),
-    Essen(mealKey: 'falafelTeller', preis: 7.80, art: EssensArt.vegan),
-    Essen(mealKey: 'wienerSchnitzel', preis: 12.50, art: EssensArt.mitFleisch),
-    Essen(mealKey: 'pizzaMargherita', preis: 7.50, art: EssensArt.vegetarisch),
-    Essen(mealKey: 'tofuPfanne', preis: 8.20, art: EssensArt.vegan),
-    Essen(mealKey: 'rindergulasch', preis: 11.00, art: EssensArt.mitFleisch),
+    Essen(mealKey: 'spaghettiCarbonara', preis: 9.50, art: EssensArt.mitFleisch, nameDe: 'Spaghetti Carbonara', nameEn: 'Spaghetti Carbonara'),
+    Essen(mealKey: 'linsenCurry', preis: 8.00, art: EssensArt.vegan, nameDe: 'Linsen-Curry', nameEn: 'Lentil Curry'),
+    Essen(mealKey: 'kaesespaetzle', preis: 8.50, art: EssensArt.vegetarisch, nameDe: 'Käsespätzle', nameEn: 'Cheese Spaetzle'),
+    Essen(mealKey: 'haehnchenSuessSauer', preis: 10.20, art: EssensArt.mitFleisch, nameDe: 'Hähnchen süß-sauer', nameEn: 'Sweet and Sour Chicken'),
+    Essen(mealKey: 'gemueseLasagne', preis: 9.00, art: EssensArt.vegetarisch, nameDe: 'Gemüse-Lasagne', nameEn: 'Vegetable Lasagna'),
+    Essen(mealKey: 'falafelTeller', preis: 7.80, art: EssensArt.vegan, nameDe: 'Falafel-Teller', nameEn: 'Falafel Plate'),
+    Essen(mealKey: 'wienerSchnitzel', preis: 12.50, art: EssensArt.mitFleisch, nameDe: 'Wiener Schnitzel', nameEn: 'Viennese Schnitzel'),
+    Essen(mealKey: 'pizzaMargherita', preis: 7.50, art: EssensArt.vegetarisch, nameDe: 'Pizza Margherita', nameEn: 'Margherita Pizza'),
+    Essen(mealKey: 'tofuPfanne', preis: 8.20, art: EssensArt.vegan, nameDe: 'Tofu-Pfanne', nameEn: 'Tofu Stir-fry'),
+    Essen(mealKey: 'rindergulasch', preis: 11.00, art: EssensArt.mitFleisch, nameDe: 'Rindergulasch', nameEn: 'Beef Goulash'),
   ];
 
   Essensdatenbank._internal();
@@ -31,14 +31,50 @@ class Essensdatenbank {
   }
 
   void updateEssen(int index, Essen neuesEssen) {
-    if (index >= 0 && index < _speisekarte.length) {
-      _speisekarte[index] = neuesEssen;
+    // Suche das Essen anhand des mealKey und ersetze es überall in der Liste
+    final idx = _speisekarte.indexWhere((e) => e.mealKey == neuesEssen.mealKey);
+    if (idx != -1) {
+      _speisekarte[idx] = neuesEssen;
     }
   }
 }
 
 // Helfer-Funktionen
-String getTranslatedMealName(String mealKey, AppLocalizations l10n, {String? fallbackName}) {
+String getTranslatedMealName(String mealKey, AppLocalizations l10n, {String? fallbackName, Essen? essen}) {
+  // Prüfe, ob mealKey zu den Standardgerichten gehört
+  const standardKeys = [
+    'spaghettiCarbonara',
+    'linsenCurry',
+    'kaesespaetzle',
+    'haehnchenSuessSauer',
+    'gemueseLasagne',
+    'falafelTeller',
+    'wienerSchnitzel',
+    'pizzaMargherita',
+    'tofuPfanne',
+    'rindergulasch',
+  ];
+
+  // Wenn ein Essen-Objekt übergeben wurde und ein benutzerdefinierter Name gesetzt ist, nutze diesen
+  if (essen != null) {
+    if (l10n.localeName.startsWith('de')) {
+      // Wenn ein Name gesetzt ist und sich vom Standard unterscheidet, nutze ihn
+      if (essen.nameDe != null && essen.nameDe!.trim().isNotEmpty) {
+        // Für Standardgerichte: nur wenn der Name sich vom ARB unterscheidet
+        if (!standardKeys.contains(mealKey) || essen.nameDe!.trim() != _getStandardNameDe(mealKey, l10n)) {
+          return essen.nameDe!;
+        }
+      }
+    } else {
+      if (essen.nameEn != null && essen.nameEn!.trim().isNotEmpty) {
+        if (!standardKeys.contains(mealKey) || essen.nameEn!.trim() != _getStandardNameEn(mealKey, l10n)) {
+          return essen.nameEn!;
+        }
+      }
+    }
+  }
+
+  // Standardfall: ARB-Text
   switch (mealKey) {
     case 'spaghettiCarbonara': return l10n.spaghettiCarbonara;
     case 'linsenCurry': return l10n.linsenCurry;
@@ -50,15 +86,48 @@ String getTranslatedMealName(String mealKey, AppLocalizations l10n, {String? fal
     case 'pizzaMargherita': return l10n.pizzaMargherita;
     case 'tofuPfanne': return l10n.tofuPfanne;
     case 'rindergulasch': return l10n.rindergulasch;
-    default:
-      return fallbackName != null && fallbackName.isNotEmpty ? fallbackName : l10n.unknownMeal;
   }
+  // Für neue Gerichte: nutze die Felder nameDe/nameEn
+  if (essen != null) {
+    if (l10n.localeName.startsWith('de')) {
+      return essen.nameDe ?? fallbackName ?? l10n.unknownMeal;
+    } else {
+      return essen.nameEn ?? fallbackName ?? l10n.unknownMeal;
+    }
+  }
+  return fallbackName != null && fallbackName.isNotEmpty ? fallbackName : l10n.unknownMeal;
 }
 
-String getTranslatedArtName(EssensArt art, AppLocalizations l10n) {
-  switch (art) {
-    case EssensArt.vegetarisch: return l10n.vegetarian;
-    case EssensArt.vegan: return l10n.vegan;
-    case EssensArt.mitFleisch: return l10n.withMeat;
+// Hilfsfunktionen für Standardnamen
+String _getStandardNameDe(String mealKey, AppLocalizations l10n) {
+  switch (mealKey) {
+    case 'spaghettiCarbonara': return l10n.spaghettiCarbonara;
+    case 'linsenCurry': return l10n.linsenCurry;
+    case 'kaesespaetzle': return l10n.kaesespaetzle;
+    case 'haehnchenSuessSauer': return l10n.haehnchenSuessSauer;
+    case 'gemueseLasagne': return l10n.gemueseLasagne;
+    case 'falafelTeller': return l10n.falafelTeller;
+    case 'wienerSchnitzel': return l10n.wienerSchnitzel;
+    case 'pizzaMargherita': return l10n.pizzaMargherita;
+    case 'tofuPfanne': return l10n.tofuPfanne;
+    case 'rindergulasch': return l10n.rindergulasch;
+    default: return '';
+  }
+}
+String _getStandardNameEn(String mealKey, AppLocalizations l10n) {
+  // Die englischen Namen kommen aus den ARB-Strings der englischen Lokalisierung
+  // (hier als Fallback: deutsche Namen, falls keine englische Lokalisierung geladen ist)
+  switch (mealKey) {
+    case 'spaghettiCarbonara': return l10n.spaghettiCarbonara;
+    case 'linsenCurry': return l10n.linsenCurry;
+    case 'kaesespaetzle': return l10n.kaesespaetzle;
+    case 'haehnchenSuessSauer': return l10n.haehnchenSuessSauer;
+    case 'gemueseLasagne': return l10n.gemueseLasagne;
+    case 'falafelTeller': return l10n.falafelTeller;
+    case 'wienerSchnitzel': return l10n.wienerSchnitzel;
+    case 'pizzaMargherita': return l10n.pizzaMargherita;
+    case 'tofuPfanne': return l10n.tofuPfanne;
+    case 'rindergulasch': return l10n.rindergulasch;
+    default: return '';
   }
 }

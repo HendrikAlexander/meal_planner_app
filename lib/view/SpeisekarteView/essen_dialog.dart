@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meal_planner_app/l10n/app_localizations.dart';
+import 'package:meal_planner_app/model/essens_art.dart';
 import 'package:meal_planner_app/model/user.dart';
 import 'package:provider/provider.dart';
 import '../../model/essen.dart';
@@ -7,6 +8,7 @@ import '../../model/essens_datenbank.dart';
 import '../../viewmodel/SpeisekarteViewModel/essen_viewmodel.dart';
 import 'add_essen_dialog.dart';
 import '../../viewmodel/LoginViewModel/login_viewmodel.dart';
+import '../../viewmodel/SpeisekarteViewModel/essen_viewmodel.dart';
 
 class EssenDialog extends StatelessWidget {
   const EssenDialog({super.key});
@@ -49,7 +51,7 @@ class EssenDialog extends StatelessWidget {
         itemCount: essenVM.essenListe.length,
         itemBuilder: (context, index) {
           final essen = essenVM.essenListe[index];
-          final translatedName = getTranslatedMealName(essen.mealKey, l10n, fallbackName: essen.name);
+          final translatedName = getTranslatedMealName(essen.mealKey, l10n, fallbackName: null, essen: essen);
           final translatedArt = getTranslatedArtName(essen.art, l10n);
 
           final tile = ListTile(
@@ -110,5 +112,16 @@ class EssenDialog extends StatelessWidget {
             )
           : null,
     );
+  }
+}
+
+String getTranslatedArtName(EssensArt art, AppLocalizations l10n) {
+  switch (art) {
+    case EssensArt.vegetarisch:
+      return l10n.vegetarian;
+    case EssensArt.vegan:
+      return l10n.vegan;
+    case EssensArt.mitFleisch:
+      return l10n.withMeat;
   }
 }

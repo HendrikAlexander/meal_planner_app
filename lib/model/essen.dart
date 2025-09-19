@@ -7,12 +7,14 @@ class Essen {
   final String mealKey;
   final double preis;
   final EssensArt art;
-  final String? name;
+  final String? nameDe;
+  final String? nameEn;
 
   Essen({
     required this.mealKey,
     required this.preis,
     required this.art,
-    this.name,
+    this.nameDe,
+    this.nameEn,
   });
 }

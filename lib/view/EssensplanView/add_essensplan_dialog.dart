@@ -120,7 +120,7 @@ class _AddEssensplanDialogState extends State<AddEssensplanDialog> {
                 },
                 children: List.generate(_ausgewaehlteEssen.length, (index) {
                   final essen = _ausgewaehlteEssen[index];
-                  final translatedName = getTranslatedMealName(essen.mealKey, l10n);
+                  final translatedName = getTranslatedMealName(essen.mealKey, l10n, essen: essen);
             
                   return ListTile(
                     key: ValueKey(essen.mealKey), // key: ValueKey(essen.name + index.toString()),
@@ -153,7 +153,7 @@ class _AddEssensplanDialogState extends State<AddEssensplanDialog> {
               const Divider(height: 30),
               Text(l10n.availableMealsLabel, style: const TextStyle(fontWeight: FontWeight.bold)),
               ...verfuegbareEssen.map((essen) {
-                final translatedName = getTranslatedMealName(essen.mealKey, l10n);
+                final translatedName = getTranslatedMealName(essen.mealKey, l10n, essen: essen);
                 return ListTile(
                   title: Text(translatedName),
                   trailing: IconButton(

@@ -14,20 +14,22 @@ class EssenViewModel extends ChangeNotifier {
 
   void addEssen(Essen neuesEssen) {
     _datenbank.addEssen(neuesEssen);
-    _essenListe.add(neuesEssen);
+    _essenListe = List.from(_datenbank.speisekarte); // Synchronisieren
     notifyListeners();
   }
 
   void deleteEssen(Essen essen) {
     _datenbank.deleteEssen(essen);
-    _essenListe.removeWhere((item) => item.mealKey == essen.mealKey);
+    _essenListe = List.from(_datenbank.speisekarte); // Synchronisieren
     notifyListeners();
   }
 
   void updateEssen(int index, Essen neuesEssen) {
-    if (index >= 0 && index < _essenListe.length) {
-      _datenbank.updateEssen(index, neuesEssen);
-      _essenListe[index] = neuesEssen;
+    // Suche das Essen anhand des mealKey
+    final idx = _essenListe.indexWhere((e) => e.mealKey == neuesEssen.mealKey);
+    if (idx != -1) {
+      _datenbank.updateEssen(idx, neuesEssen);
+      _essenListe = List.from(_datenbank.speisekarte); // Synchronisieren
       notifyListeners();
     }
   }

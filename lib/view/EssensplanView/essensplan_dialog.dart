@@ -145,7 +145,7 @@ class _EssensplanDialogState extends State<EssensplanDialog> {
                       //final wochentag = essenIndex < wochentage.length ? wochentage[essenIndex] : '';
                       final wochentagKey = wochentageKeys[essenIndex];
 
-                      final translatedName = getTranslatedMealName(essen.mealKey, l10n);
+                      final translatedName = getTranslatedMealName(essen.mealKey, l10n, essen: essen);
                       final translatedArt = getTranslatedArtName(essen.art, l10n);
                       final translatedWeekday = l10n.translate(wochentagKey); 
 
@@ -251,5 +251,13 @@ extension LocalizationHelper on AppLocalizations {
       case 'friday': return friday;
       default: return '';
     }
+  }
+}
+
+String getTranslatedArtName(EssensArt art, AppLocalizations l10n) {
+  switch (art) {
+    case EssensArt.vegetarisch: return l10n.vegetarian;
+    case EssensArt.vegan: return l10n.vegan;
+    case EssensArt.mitFleisch: return l10n.withMeat;
   }
 }

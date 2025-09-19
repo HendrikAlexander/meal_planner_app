@@ -10,6 +10,8 @@ import 'package:provider/provider.dart';
 import '../../viewmodel/EssensbewertungViewModel/essensbewertung_viewmodel.dart';
 import '../../model/essensbewertung.dart';
 import 'add_bewertung_dialog.dart';
+import '../../model/essen.dart';
+import '../../model/essens_art.dart';
 
 /// Ansicht zur Anzeige aller abgegebenen Bewertungen mit Bearbeitungsfunktion
 class BewertungDialog extends StatelessWidget {
@@ -32,7 +34,22 @@ class BewertungDialog extends StatelessWidget {
               itemCount: bewertungen.length,
               itemBuilder: (context, index) {
                 final bewertung = bewertungen[index];
-                 final translatedMealName = getTranslatedMealName(bewertung.essenMealKey, l10n);
+                // Suche das passende Essen-Objekt anhand des mealKey
+                final essen = Essensdatenbank.instance.speisekarte.firstWhere(
+                  (e) => e.mealKey == bewertung.essenMealKey,
+                  orElse: () => Essen(
+                    mealKey: bewertung.essenMealKey,
+                    preis: 0.0,
+                    art: EssensArt.vegetarisch,
+                    nameDe: null,
+                    nameEn: null,
+                  ),
+                );
+                final translatedMealName = getTranslatedMealName(
+                  bewertung.essenMealKey,
+                  l10n,
+                  essen: essen,
+                );
 
                 return Card(
                   margin: const EdgeInsets.all(8.0),
