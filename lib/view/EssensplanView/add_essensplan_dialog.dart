@@ -26,7 +26,7 @@ class _AddEssensplanDialogState extends State<AddEssensplanDialog> {
   @override
   void initState() {
     super.initState();
-    if (isEditing) { //widget.plan != null
+    if (isEditing) { 
       _wochennummerController.text = widget.plan!.wochennummer.toString();
       _ausgewaehlteEssen.addAll(widget.plan!.essenProWoche);
     }
@@ -38,45 +38,38 @@ class _AddEssensplanDialogState extends State<AddEssensplanDialog> {
   }
 
   void _gerichtBearbeiten(Essen altesEssen) async {
-    // Das Ergebnis des Dialogs abwarten. 
-    // Es kann ein geändertes Essen, der Text 'DELETE_ACTION' oder null (bei Abbruch) sein.
+    
     final result = await showDialog(
       context: context,
       builder: (context) => AddEssenDialog(essen: altesEssen),
     );
 
-    // Wenn der Benutzer "Abbrechen" drückt, passiert nichts.
+    
     if (result == null) return;
 
-    // Wir rufen setState auf, um die UI nach der Aktion zu aktualisieren.
+    
     setState(() {
       if (result == 'DELETE_ACTION') {
-        // FALL 1: Das Gericht soll gelöscht werden.
-        // Wir entfernen es aus unserer lokalen Auswahlliste.
+        
         _ausgewaehlteEssen.removeWhere((e) => e.mealKey == altesEssen.mealKey);
-        //_ausgewaehlteEssen.remove(altesEssen);
-        // Und löschen es aus der zentralen Datenbank.
+        
         _datenbank.deleteEssen(altesEssen);
       } else if (result is Essen) {
-        // Da das Essen-Objekt "final" Eigenschaften hat, können wir es nicht direkt ändern.
-        // Stattdessen müssen wir das alte Objekt in der Datenbank durch das neue ersetzen.
+        
         final originalIndexInDb = _datenbank.speisekarte.indexWhere(
           (e) => e.mealKey == altesEssen.mealKey,
-           );// indexOf(altesEssen);
+           );
         if (originalIndexInDb != -1) {
           _datenbank.updateEssen(originalIndexInDb, result);
         }
          final originalIndexInPlan = _ausgewaehlteEssen.indexWhere(
-          (e) => e.mealKey == altesEssen.mealKey,// indexOf(altesEssen);
+          (e) => e.mealKey == altesEssen.mealKey,
           );
           if (originalIndexInPlan != -1) {
           _ausgewaehlteEssen[originalIndexInPlan] = result;
           }
         }
-      // FALL 2: Das Gericht wurde nur bearbeitet.
-      // Da wir das Objekt direkt verändern (mutieren), reicht der Aufruf von setState(),
-      // um die UI mit den neuen Werten (z.B. neuer Name) neu zu zeichnen.
-      // Wir brauchen hier also keine weitere explizite else-if-Bedingung.
+      
     });
   }
 
@@ -90,7 +83,7 @@ class _AddEssensplanDialogState extends State<AddEssensplanDialog> {
     final wochentage = [l10n.monday, l10n.tuesday, l10n.wednesday, l10n.thursday, l10n.friday];
 
     return AlertDialog(
-      title: Text(isEditing ? l10n.editPlanTitle : l10n.addPlanTitle), //widget.plan == null
+      title: Text(isEditing ? l10n.editPlanTitle : l10n.addPlanTitle), 
       content: SizedBox(
         width: MediaQuery.of(context).size.width * 0.8,
         child: SingleChildScrollView(
@@ -123,10 +116,10 @@ class _AddEssensplanDialogState extends State<AddEssensplanDialog> {
                   final translatedName = getTranslatedMealName(essen.mealKey, l10n, essen: essen);
             
                   return ListTile(
-                    key: ValueKey(essen.mealKey), // key: ValueKey(essen.name + index.toString()),
+                    key: ValueKey(essen.mealKey), 
                     leading: const Icon(Icons.drag_handle),
                     title: Text('${wochentage.length > index ? wochentage[index] : ''}: $translatedName'),
-                    // KORRIGIERT: Wir benutzen eine Row, um beide Buttons unterzubringen
+                    
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [

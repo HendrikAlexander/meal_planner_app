@@ -8,7 +8,6 @@ import '../../model/essens_datenbank.dart';
 import '../../viewmodel/SpeisekarteViewModel/essen_viewmodel.dart';
 import 'add_essen_dialog.dart';
 import '../../viewmodel/LoginViewModel/login_viewmodel.dart';
-import '../../viewmodel/SpeisekarteViewModel/essen_viewmodel.dart';
 
 class EssenDialog extends StatelessWidget {
   const EssenDialog({super.key});

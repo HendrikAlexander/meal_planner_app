@@ -31,7 +31,7 @@ class Essensdatenbank {
   }
 
   void updateEssen(int index, Essen neuesEssen) {
-    // Suche das Essen anhand des mealKey und ersetze es überall in der Liste
+    
     final idx = _speisekarte.indexWhere((e) => e.mealKey == neuesEssen.mealKey);
     if (idx != -1) {
       _speisekarte[idx] = neuesEssen;
@@ -39,9 +39,9 @@ class Essensdatenbank {
   }
 }
 
-// Helfer-Funktionen
+
 String getTranslatedMealName(String mealKey, AppLocalizations l10n, {String? fallbackName, Essen? essen}) {
-  // Prüfe, ob mealKey zu den Standardgerichten gehört
+  
   const standardKeys = [
     'spaghettiCarbonara',
     'linsenCurry',
@@ -55,12 +55,12 @@ String getTranslatedMealName(String mealKey, AppLocalizations l10n, {String? fal
     'rindergulasch',
   ];
 
-  // Wenn ein Essen-Objekt übergeben wurde und ein benutzerdefinierter Name gesetzt ist, nutze diesen
+  
   if (essen != null) {
     if (l10n.localeName.startsWith('de')) {
-      // Wenn ein Name gesetzt ist und sich vom Standard unterscheidet, nutze ihn
+      
       if (essen.nameDe != null && essen.nameDe!.trim().isNotEmpty) {
-        // Für Standardgerichte: nur wenn der Name sich vom ARB unterscheidet
+        
         if (!standardKeys.contains(mealKey) || essen.nameDe!.trim() != _getStandardNameDe(mealKey, l10n)) {
           return essen.nameDe!;
         }
@@ -74,7 +74,7 @@ String getTranslatedMealName(String mealKey, AppLocalizations l10n, {String? fal
     }
   }
 
-  // Standardfall: ARB-Text
+  
   switch (mealKey) {
     case 'spaghettiCarbonara': return l10n.spaghettiCarbonara;
     case 'linsenCurry': return l10n.linsenCurry;
@@ -87,7 +87,7 @@ String getTranslatedMealName(String mealKey, AppLocalizations l10n, {String? fal
     case 'tofuPfanne': return l10n.tofuPfanne;
     case 'rindergulasch': return l10n.rindergulasch;
   }
-  // Für neue Gerichte: nutze die Felder nameDe/nameEn
+  
   if (essen != null) {
     if (l10n.localeName.startsWith('de')) {
       return essen.nameDe ?? fallbackName ?? l10n.unknownMeal;
@@ -98,7 +98,7 @@ String getTranslatedMealName(String mealKey, AppLocalizations l10n, {String? fal
   return fallbackName != null && fallbackName.isNotEmpty ? fallbackName : l10n.unknownMeal;
 }
 
-// Hilfsfunktionen für Standardnamen
+
 String _getStandardNameDe(String mealKey, AppLocalizations l10n) {
   switch (mealKey) {
     case 'spaghettiCarbonara': return l10n.spaghettiCarbonara;
@@ -115,8 +115,7 @@ String _getStandardNameDe(String mealKey, AppLocalizations l10n) {
   }
 }
 String _getStandardNameEn(String mealKey, AppLocalizations l10n) {
-  // Die englischen Namen kommen aus den ARB-Strings der englischen Lokalisierung
-  // (hier als Fallback: deutsche Namen, falls keine englische Lokalisierung geladen ist)
+  
   switch (mealKey) {
     case 'spaghettiCarbonara': return l10n.spaghettiCarbonara;
     case 'linsenCurry': return l10n.linsenCurry;

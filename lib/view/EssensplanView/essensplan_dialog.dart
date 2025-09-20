@@ -20,18 +20,15 @@ class EssensplanDialog extends StatefulWidget {
 }
 
 class _EssensplanDialogState extends State<EssensplanDialog> {
-// final viewModel = EssensplanViewModel();
-//late List<Essensplan> _allePlaene;
-//  List<Essensplan> _gefiltertePlaene = [];
+
   final _filterController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-   // _allePlaene = viewModel.wochenplaene;
-   // _gefiltertePlaene = _allePlaene;
+   
   _filterController.addListener(() => setState(() {}));
-   // _filterController.addListener(_filterPlaene);
+   
   }
 
   @override
@@ -40,18 +37,7 @@ class _EssensplanDialogState extends State<EssensplanDialog> {
     super.dispose();
   }
 
-  //void _filterPlaene() {
-  //  final query = _filterController.text;
-   // setState(() {
-   //   if (query.isEmpty) {
-   //     _gefiltertePlaene = _allePlaene;
-   //   } else {
-    //    _gefiltertePlaene = _allePlaene.where((plan) {
-    //      return plan.wochennummer.toString().contains(query);
-    //    }).toList();
-    //  }
-   // });
-// }
+ 
 
   void _einenNeuenPlanHinzufuegen() async {
     final viewModel = Provider.of<EssensplanViewModel>(context, listen: false);
@@ -61,13 +47,13 @@ class _EssensplanDialogState extends State<EssensplanDialog> {
     );
     if (neuerPlan != null) {
       viewModel.addEssensplan(neuerPlan);
-      //_filterPlaene(); // Filter neu anwenden
+      
     }
   }
 
   void _einenPlanBearbeiten(Essensplan alterPlan) async {
     final viewModel = Provider.of<EssensplanViewModel>(context, listen: false);
-    // final originalIndex = _allePlaene.indexOf(alterPlan);
+    
     final originalIndex = viewModel.wochenplaene.indexOf(alterPlan);
 
     final geaenderterPlan = await showDialog<Essensplan>(
@@ -76,36 +62,30 @@ class _EssensplanDialogState extends State<EssensplanDialog> {
     );
     if (geaenderterPlan != null) {
       viewModel.updateEssensplan(originalIndex, geaenderterPlan);
-      // HINWEIS: Die setState-Zeile hier war überflüssig und wurde entfernt,
-      // da _filterPlaene() bereits setState aufruft.
-      // _filterPlaene(); // Filter neu anwenden
+      
     }
   }
 
  void _einenPlanLoeschen(Essensplan plan) {
   Provider.of<EssensplanViewModel>(context, listen: false)
   .deleteEssensplan(plan);
-   // setState(() {
-   //   viewModel.deleteEssensplan(plan);
-   //   _filterPlaene(); 
-   // });
+   
   }
 
   @override
   Widget build(BuildContext context) {
     final essensplanVM = context.watch<EssensplanViewModel>();
-    // final loginVM = Provider.of<LoginViewModel>(context, listen: false);
-    final loginVM = context.read<LoginViewModel>(); // "read" für einmaligen Zugriff
+    final loginVM = context.read<LoginViewModel>(); 
     final isAdmin = loginVM.loggedInUser?.role == UserRole.admin;
     final l10n = AppLocalizations.of(context)!;
 
-    // Die Filterlogik wird jetzt direkt hier im Build angewendet.
+    
     final query = _filterController.text;
     final gefiltertePlaene = essensplanVM.wochenplaene.where((plan) {
       return plan.wochennummer.toString().contains(query);
     }).toList();
     
-    // Eine Liste mit den Wochentagen für die Anzeige
+    
     const wochentageKeys = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
 
     return Scaffold(
@@ -126,23 +106,22 @@ class _EssensplanDialogState extends State<EssensplanDialog> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: gefiltertePlaene.length, // _ weggenommen
+              itemCount: gefiltertePlaene.length, 
               itemBuilder: (context, index) {
-                final plan = gefiltertePlaene[index]; // _ weggenommen
+                final plan = gefiltertePlaene[index]; 
 
-                // Der Inhalt der Kachel, der für beide (Admin/User) gleich ist
+                
                 final tileContent = ExpansionTile(
                   title: Text(
                     '${l10n.week} ${plan.wochennummer}',
-                    // 'Woche ${plan.wochennummer}',
+                    
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  // KORRIGIERT: Wir bauen die Liste jetzt mit Index, um den Wochentag zuzuordnen
+                  
                   children: [
                     ...List.generate(plan.essenProWoche.length, (essenIndex) {
                       final essen = plan.essenProWoche[essenIndex];
-                      // Wir stellen sicher, dass wir nicht mehr Wochentage als vorhanden zugreifen
-                      //final wochentag = essenIndex < wochentage.length ? wochentage[essenIndex] : '';
+                      
                       final wochentagKey = wochentageKeys[essenIndex];
 
                       final translatedName = getTranslatedMealName(essen.mealKey, l10n, essen: essen);
@@ -151,16 +130,16 @@ class _EssensplanDialogState extends State<EssensplanDialog> {
 
                       return ListTile(
                         title: Text('$translatedWeekday: $translatedName'),
-                        //Text('${wochentag}: ${essen.name}'),
+                        
                         subtitle: Text(
                           '$translatedArt – ${essen.preis.toStringAsFixed(2)} €',
-                          // '${essen.art.localizedName} – ${essen.preis.toStringAsFixed(2)} €',
+                          
                         ),
                         trailing: IconButton(
                           icon: const Icon(Icons.rate_review_outlined),
                           tooltip: l10n.addReviewTooltip,
                           onPressed: () {
-                            // Annahme: AddBewertungDialog benötigt ein `essen`-Objekt
+                            
                             showDialog(
                               context: context,
                               builder: (context) => AddBewertungDialog(essen: essen),
@@ -169,7 +148,7 @@ class _EssensplanDialogState extends State<EssensplanDialog> {
                         ),
                       );
                     }),
-                    // Der "Bearbeiten"-Button wird nur für Admins innerhalb der ExpansionTile angezeigt
+                    
                     if (isAdmin)
                       Align(
                         alignment: Alignment.centerRight,
@@ -183,10 +162,10 @@ class _EssensplanDialogState extends State<EssensplanDialog> {
                 );
 
                 if (isAdmin) {
-                  // Admins bekommen die Wisch-zum-Löschen-Funktion
+                  
                   return Dismissible(
                     key: ValueKey(plan.wochennummer),
-                    // key: Key(plan.wochennummer.toString() + plan.essenProWoche.toString()),
+                    
                     direction: DismissDirection.endToStart,
                     background: Container(
                       color: Colors.red,
@@ -195,9 +174,7 @@ class _EssensplanDialogState extends State<EssensplanDialog> {
                       child: const Icon(Icons.delete, color: Colors.white),
                     ),
                     onDismissed: (direction) => _einenPlanLoeschen(plan),
-                   // onDismissed: (direction) {
-                   //   _einenPlanLoeschen(plan);
-                   // },
+                   
                     confirmDismiss: (direction) async {
                       return await showDialog<bool>(
                         context: context,
@@ -219,7 +196,7 @@ class _EssensplanDialogState extends State<EssensplanDialog> {
                     ),
                   );
                 } else {
-                  // Normale User sehen nur die Kachel ohne Wisch-Funktion
+                  
                   return Card(
                     margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     child: tileContent,
@@ -240,7 +217,7 @@ class _EssensplanDialogState extends State<EssensplanDialog> {
     );
   }
 }
-// Kleine Helfer-Extension auf AppLocalizations, um Wochentage dynamisch zu übersetzen.
+
 extension LocalizationHelper on AppLocalizations {
   String translate(String key) {
     switch (key) {

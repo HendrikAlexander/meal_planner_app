@@ -14,13 +14,13 @@ class EssenViewModel extends ChangeNotifier {
 
   void addEssen(Essen neuesEssen) {
     _datenbank.addEssen(neuesEssen);
-    _essenListe = List.from(_datenbank.speisekarte); // Synchronisieren
+    _essenListe = List.from(_datenbank.speisekarte); 
     notifyListeners();
   }
 
   void deleteEssen(Essen essen) {
     _datenbank.deleteEssen(essen);
-    _essenListe = List.from(_datenbank.speisekarte); // Synchronisieren
+    _essenListe = List.from(_datenbank.speisekarte); 
     notifyListeners();
   }
 
@@ -29,7 +29,7 @@ class EssenViewModel extends ChangeNotifier {
     final idx = _essenListe.indexWhere((e) => e.mealKey == neuesEssen.mealKey);
     if (idx != -1) {
       _datenbank.updateEssen(idx, neuesEssen);
-      _essenListe = List.from(_datenbank.speisekarte); // Synchronisieren
+      _essenListe = List.from(_datenbank.speisekarte); 
       notifyListeners();
     }
   }

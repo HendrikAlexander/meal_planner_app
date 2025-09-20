@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:meal_planner_app/l10n/app_localizations.dart';
@@ -21,7 +20,7 @@ class LoginView extends StatelessWidget {
           padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch, // Lässt Buttons die volle Breite einnehmen
+            crossAxisAlignment: CrossAxisAlignment.stretch, 
             children: [
               TextField(
                 decoration: InputDecoration(labelText: l10n.username),
@@ -36,7 +35,7 @@ class LoginView extends StatelessWidget {
               const SizedBox(height: 10),
               DropdownButton<UserRole>(
                 value: context.watch<LoginViewModel>().selectedRole,
-                isExpanded: true, // Nimmt die volle Breite ein
+                isExpanded: true, 
                 hint:  Text(l10n.selectRole),
                 items: UserRole.values.map((role) {
                   return DropdownMenuItem(
@@ -57,17 +56,17 @@ class LoginView extends StatelessWidget {
                 child: Text(l10n.loginButton),
               ),
                SizedBox(height: 10),
-              // NEUER BUTTON: Für den Gast-Login
+              
               TextButton(
                 onPressed: () {
-                  // Ruft die neue ViewModel-Funktion auf
+                  
                   vm.loginAsGuest();
-                  // Navigiert direkt zur Startseite
+                  
                   Navigator.pushReplacementNamed(context, '/');
                 },
                 child: Text(l10n.continueAsGuest),
               ),
-               // HIER kommt der Sprachwechsel-Knopf/die Knöpfe
+               
               Text("${AppLocalizations.of(context)!.changeLanguage}:"),
               const SizedBox(height: 10),
               Row(

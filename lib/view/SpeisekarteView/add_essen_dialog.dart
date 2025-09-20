@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:meal_planner_app/l10n/app_localizations.dart';
 import '../../model/essen.dart';
 import '../../model/essens_art.dart';
-import '../../model/essens_datenbank.dart';
 
 class AddEssenDialog extends StatefulWidget {
-  final Essen? essen; // Kann ein bestehendes Essen zum Bearbeiten sein
+  final Essen? essen; 
   const AddEssenDialog({super.key, this.essen});
 
   @override
@@ -13,21 +12,20 @@ class AddEssenDialog extends StatefulWidget {
 }
 
 class _AddEssenDialogState extends State<AddEssenDialog> {
-  final _formKey = GlobalKey<FormState>();
-  // Wir verwenden Controller für die Textfelder
+  
   final _nameDeController = TextEditingController();
   final _nameEnController = TextEditingController();
   final _preisController = TextEditingController();
   late EssensArt _ausgewaehlteArt;
 
-  // Bestimmt, ob wir im "Bearbeiten"-Modus sind
+  
   bool get isEditing => widget.essen != null;
 
   @override
   void initState() {
     super.initState();
 
-    // Wenn wir ein Essen bearbeiten, füllen wir die Felder mit den existierenden Daten.
+    
     if (isEditing) {
       final essen = widget.essen!;
       _nameDeController.text = essen.nameDe ?? '';
@@ -35,7 +33,7 @@ class _AddEssenDialogState extends State<AddEssenDialog> {
       _preisController.text = essen.preis.toString();
       _ausgewaehlteArt = essen.art;
     } else {
-      // Wenn wir ein neues Essen erstellen, starten wir mit einem Standardwert.
+      
       _ausgewaehlteArt = EssensArt.vegetarisch;
     }
   }
@@ -50,7 +48,7 @@ class _AddEssenDialogState extends State<AddEssenDialog> {
 
   @override
   Widget build(BuildContext context) {
-    // Hole die Übersetzungen
+    
     final l10n = AppLocalizations.of(context)!;
 
     return AlertDialog(
@@ -59,8 +57,7 @@ class _AddEssenDialogState extends State<AddEssenDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Im Bearbeiten-Modus kann der Name (mealKey) nicht geändert werden.
-            // Wir zeigen ihn nur an.
+            
             TextField(
               controller: _nameDeController,
               decoration: InputDecoration(labelText: '${l10n.mealNameLabel} (DE)'),
@@ -130,7 +127,7 @@ class _AddEssenDialogState extends State<AddEssenDialog> {
   }
 }
 
-// Füge diese Hilfsfunktion am Ende der Datei hinzu (vor der letzten Klammer):
+
 String getTranslatedArtName(EssensArt art, AppLocalizations l10n) {
   switch (art) {
     case EssensArt.vegetarisch: return l10n.vegetarian;

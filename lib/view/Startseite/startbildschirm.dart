@@ -11,15 +11,15 @@ class Startbildschirm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Wir holen uns die Instanz des LoginViewModels, die von Provider verwaltet wird.
+    
     final loginVM = Provider.of<LoginViewModel>(context);
     final l10n = AppLocalizations.of(context)!;
 
-    // Wir bauen den Text zusammen, der angezeigt werden soll.
+    
     String anzeigeText = '';
     if (loginVM.loggedInUser != null) {
       final user = loginVM.loggedInUser!;
-      // Wir wandeln die Rolle in einen schön lesbaren Text um.
+      
       final rolle = user.role == UserRole.admin ? l10n.adminRole : l10n.userRole;
       anzeigeText = l10n.loggedInAsInfo(user.username, rolle);
     }
@@ -30,9 +30,9 @@ class Startbildschirm extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
         automaticallyImplyLeading: false,
-        // NEU: Die "actions"-Eigenschaft fügt Widgets auf der rechten Seite der AppBar hinzu.
+        
         actions: [
-          // Wir zeigen den Text nur an, wenn ein Benutzer eingeloggt ist.
+          
           if (loginVM.loggedInUser != null)
             Padding(
               padding: const EdgeInsets.only(right: 16.0),

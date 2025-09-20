@@ -13,7 +13,7 @@ import 'add_bewertung_dialog.dart';
 import '../../model/essen.dart';
 import '../../model/essens_art.dart';
 
-/// Ansicht zur Anzeige aller abgegebenen Bewertungen mit Bearbeitungsfunktion
+
 class BewertungDialog extends StatelessWidget {
   const BewertungDialog({super.key});
 
@@ -34,7 +34,7 @@ class BewertungDialog extends StatelessWidget {
               itemCount: bewertungen.length,
               itemBuilder: (context, index) {
                 final bewertung = bewertungen[index];
-                // Suche das passende Essen-Objekt anhand des mealKey
+                
                 final essen = Essensdatenbank.instance.speisekarte.firstWhere(
                   (e) => e.mealKey == bewertung.essenMealKey,
                   orElse: () => Essen(
@@ -58,14 +58,14 @@ class BewertungDialog extends StatelessWidget {
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Essen-Name anzeigen
+                        
                         Text(l10n.starsRating(bewertung.essensbewertung.toString())),
                         const SizedBox(height: 4),
                         Text('"${bewertung.essensbewertungstext}"'),
                         const SizedBox(height: 4),
                         Text(l10n.reviewBy(bewertung.erstelltVon)),
                         const SizedBox(height: 8),
-                        // Zeige Bild, falls vorhanden
+                        
                         if (bewertung.essensfoto.isNotEmpty)
                           Image.file(
                             File(bewertung.essensfoto),
@@ -74,7 +74,7 @@ class BewertungDialog extends StatelessWidget {
                           ),
                       ],
                     ),
-                    // Nur Admins können Bewertungen bearbeiten und löschen
+                    
                     trailing: isAdmin
                         ? Row(
                             mainAxisSize: MainAxisSize.min,

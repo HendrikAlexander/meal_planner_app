@@ -12,11 +12,11 @@ class LoginViewModel extends ChangeNotifier {
   String username = '';
   String password = '';
   UserRole selectedRole = UserRole.user;
-//  UserRole? selectedRole;
+
   AppUser? loggedInUser; 
  
   
-  // get currentRole => selectedRole;
+
   UserRole? get currentRole => loggedInUser?.role;
 
   void login() {
@@ -26,7 +26,7 @@ class LoginViewModel extends ChangeNotifier {
     }
   }
 
-  // NEUE FUNKTION: Meldet den Benutzer als Gast an.
+
   void loginAsGuest() {
     loggedInUser = AppUser(username: 'Gast', role: UserRole.user);
     selectedRole = UserRole.user;
